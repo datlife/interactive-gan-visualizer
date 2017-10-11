@@ -1,2 +1,2 @@
 # gan-data
-gan playground
+Secret
