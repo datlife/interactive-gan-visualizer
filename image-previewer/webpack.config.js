@@ -6,27 +6,25 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 // Constant with our paths
 const paths = {
-  DIST: path.resolve(__dirname, 'dist'),
-  SRC: path.resolve(__dirname, 'src'),
-  JS: path.resolve(__dirname, 'src/js'),
+  BUILD: path.resolve(__dirname, 'dist'),
+  SRC: path.resolve(__dirname, 'src/static'),  
 };
 
 // Webpack configuration
 module.exports = {
   entry: path.join(paths.SRC, 'index.js'),
   output: {
-    path: paths.DIST,
-    filename: 'app.bundle.js',
+    path: paths.BUILD,
+    filename: 'bundle.js',
   },
 
   // Tell webpack to use html plugin
   plugins: [
     new HtmlWebpackPlugin({template: path.join(paths.SRC, 'index.html'),}),
-    new ExtractTextPlugin('style.bundle.css'), // CSS will be extracted to this bundle file -> ADDED IN THIS STEP    
+    new ExtractTextPlugin('style.bundle.css'), // CSS will be extracted to this bundle file  
   ],
 
-  // Loaders configuration -> ADDED IN THIS STEP
-  // We are telling webpack to use "babel-loader" for .js and .jsx files
+  // Loaders configuration
   module: {
     rules: [
       {
@@ -37,8 +35,6 @@ module.exports = {
         ],
       },
       // CSS loader to CSS files 
-      // Files will get handled by css loader and then passed to the extract text plugin
-      // which will write it to the file we defined above
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
@@ -48,13 +44,7 @@ module.exports = {
 
     ],
   },
-  // Enable importing JS files without specifying their's extenstion -> ADDED IN THIS STEP
-  //
-  // So we can write:
-  // import MyComponent from './my-component';
-  //
-  // Instead of:
-  // import MyComponent from './my-component.jsx';
+  // Enable importing JS files without specifying their's extenstion
   resolve: {
     extensions: ['.js', '.jsx'],
   },

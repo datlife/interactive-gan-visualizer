@@ -1,13 +1,10 @@
-/* #header {
+
+/* 
+#header {
     background: #4895E5;
     align-content: right;
 }
 
-#header h1 {
-    font-weight: bold;
-    font-size: 2em;
-    color: whitesmoke;
-}
 #header label{
     display: block;
     font-size: 0.9em;

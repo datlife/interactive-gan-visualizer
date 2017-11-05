@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server",
-    "build": "webpack --progress --inline"
+    "build": "webpack --progress --verbose --colors --display-error-details",
+    "build:production": "npm run clean && npm run build",
   },
   "author": "",
   "license": "ISC",

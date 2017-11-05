@@ -1,11 +1,16 @@
-import React from 'react';
+import React, {Component} from 'react';
 import Header from './header';
-// import Footer from './footer';
 import Content from './content';
-import '../styles/main.css';
-var createClass = require('create-react-class');
+// import Footer from './footer';
 
-const App = createClass({
+// styling
+import '../styles/main.css';
+
+class App extends Component{
+    constructor(){
+        super();
+    }
+    
     render(){
         return(
             <div className="container-fluid app">   
@@ -14,6 +19,6 @@ const App = createClass({
             </div>
         )
     }
-});
+}
 
 export default App;
