@@ -1,7 +1,6 @@
-import React from 'react';
-var createClass = require('create-react-class');
+import React, {Component} from 'react';
 
-const Image = createClass({
+class Image extends Component{
   render(){
     return (
       <div className="photo-box col-6 col-xs-12">
@@ -9,6 +8,6 @@ const Image = createClass({
       </div>
     );
   }
-});
+}
 
 export default Image;
