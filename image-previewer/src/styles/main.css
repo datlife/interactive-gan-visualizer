@@ -1,20 +1,21 @@
-h1 {
-    color: lightblue;
+/* #header {
+    background: #4895E5;
+    align-content: right;
 }
 
-h2 {
-    color: blue;
+#header h1 {
+    font-weight: bold;
+    font-size: 2em;
+    color: whitesmoke;
 }
+#header label{
+    display: block;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin: 0 0 1em 0;
+} */
 
-#header input {
-    color: #4696e5 !important;
-}
 
-@media screen and (max-width: 480px) and (orientation: portrait) {
-    input[type="submit"], input[type="reset"], input[type="button"], button, .button {
-        padding-top: 0;
-        padding-right: 1.75em;
-        padding-bottom: 0;
-        padding-left: 1.75em;
-    }
+.photo-box {
+    border-style: dashed;
 }

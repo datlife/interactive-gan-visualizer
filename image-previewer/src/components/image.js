@@ -1,9 +1,10 @@
 import React from 'react';
+var createClass = require('create-react-class');
 
-const Image = React.createClass({
+const Image = createClass({
   render(){
     return (
-      <div className="photo-box col-6 col-xs-12">
+      <div className="photo-box col-6 col-xs-12 center">
           I am the photo
       </div>
     );

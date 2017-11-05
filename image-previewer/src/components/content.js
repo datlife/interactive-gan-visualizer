@@ -5,12 +5,13 @@ var createClass = require('create-react-class');
 const Content = createClass({
   render(){
     return (
-      <div className="containter fluid">
-        <div className="col-12 text-center">
-          Select and Drag an on Object
+        <div className="jumbotron">
+          <p className="lead text-center">Select and Drag an on Object</p>
+          <div className="row">
+            <Image />
+            <Image />
+          </div>
         </div>
-          <Image />
-      </div>
     );
   }
 });
