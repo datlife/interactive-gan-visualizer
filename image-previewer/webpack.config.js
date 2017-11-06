@@ -36,8 +36,13 @@ module.exports = {
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
-          use: 'css-loader',
+          use: 'css-loader?url=false',
+          publicPath: "../../"
         }),
+      },
+      {
+        test: /\.jpg$/, 
+        loader: 'url-loader',
       }
 
     ],

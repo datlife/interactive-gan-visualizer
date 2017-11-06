@@ -1,9 +1,15 @@
-.photo-box {
-    border-style: dashed;
+#header{
+    background-image: url("assets/header.jpg");
 }
+
+
 .body{
     padding-top: 2em;
     padding-bottom: 3em;
+}
+
+.photo-box {
+    border-style: dashed;
 }
 .footer{
     width: 100%;
