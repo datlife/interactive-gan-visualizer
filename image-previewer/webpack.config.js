@@ -14,6 +14,7 @@ module.exports = {
   output: {
     path: paths.BUILD,
     filename: 'bundle.js',
+    publicPath: '/',    
   },
 
   // Tell webpack to use html plugin
@@ -37,12 +38,11 @@ module.exports = {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
           use: 'css-loader?url=false',
-          publicPath: "../../"
         }),
       },
       {
         test: /\.jpg$/, 
-        loader: 'url-loader',
+        loader: 'file-loader',
       }
 
     ],
