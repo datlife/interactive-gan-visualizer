@@ -9,9 +9,9 @@ class Content extends Component{
   render(){
     return (
       <div className="body container-fluid">
-          <div className="d-flex align-items-start">
+          <div className="d-flex">
             <Image   id="original-img"  src={example} caption={"Original Image"} className="flex-row" />  {/* Display Image  */}
-            <Buttons id="controllers"   className="button-groups"/>
+            <Buttons id="controllers"/>
             <Image   id="generated-img" src={example} caption={"Generated Image"}  className="flex-row" />  {/* Display Image  */}
           </div>
 

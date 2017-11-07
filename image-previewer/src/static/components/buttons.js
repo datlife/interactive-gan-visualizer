@@ -5,7 +5,7 @@ class Buttons extends React.Component{
 
     render(){
         return(
-            <div className="button-groups d-flex flex-column align-self-stretch">
+            <div className="d-flex flex-column">
                 <div className="p-2  btn-group-vertical  btn-group-custom">
                     <button id="detect-cars" className="btn btn-primary">Detect Cars</button>
                     <button id="custom-box"  className="btn btn-primary">Custom Box</button>
