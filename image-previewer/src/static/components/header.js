@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Uploader from './uploader';
 
 class Header extends Component{
   render(){
@@ -10,6 +11,9 @@ class Header extends Component{
               <h4 className="display-4 font-weight-bold text-right">Interactive Image Generator</h4>
               <p className="lead text-right">with Generative Adversarial Network</p>
               <hr className="my-3" />
+
+              <Uploader />  {/* Upload Image  */}    
+
           </div>
       </header>
   );}

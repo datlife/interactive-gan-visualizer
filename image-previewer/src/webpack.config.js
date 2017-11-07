@@ -1,3 +1,9 @@
+// This file is a configuration file for Webpack to 
+// 1. Built development server to test front-end code
+// 2.compile front-end javascripts into single bundle.js and  
+// css files into style.bundle.css for production. 
+// When it is built properly, a folder ./dist should be appeared) 
+
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin'); 
@@ -5,11 +11,12 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 // Constant with our paths
 const paths = {
   BUILD: path.resolve(__dirname, 'dist'),
-  SRC: path.resolve(__dirname, 'src/static'),  
+  SRC: path.resolve(__dirname, 'static'),  
 };
 
 // Webpack configuration
 module.exports = {
+
   entry: path.join(paths.SRC, 'index.js'),
   output: {
     path: paths.BUILD,
@@ -20,7 +27,7 @@ module.exports = {
   // Tell webpack to use html plugin
   plugins: [
     new HtmlWebpackPlugin({template: path.join(paths.SRC, 'index.html'),}),
-    new ExtractTextPlugin('style.bundle.css'), // CSS will be extracted to this bundle file  
+    new ExtractTextPlugin('style.bundle.css'),   // CSS will be extracted to this bundle file  
   ],
 
   // Loaders configuration
@@ -33,6 +40,8 @@ module.exports = {
           'babel-loader',
         ],
       },
+      
+
       // CSS loader to CSS files 
       {
         test: /\.css$/,

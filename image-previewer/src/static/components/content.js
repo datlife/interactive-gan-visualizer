@@ -1,16 +1,20 @@
 import React, {Component} from 'react';
 import Image from './image';
-import Uploader from './uploader';
+import Buttons from './buttons';
+
+let example = require("../../assets/cute-cat.jpg");
+
 
 class Content extends Component{
   render(){
     return (
-      <div className="body container">
-          {/* Upload Image  */}
-          <Uploader />
+      <div className="body container-fluid">
+          <div className="d-flex align-items-start">
+            <Image   id="original-img"  src={example} caption={"Original Image"} className="flex-row" />  {/* Display Image  */}
+            <Buttons id="controllers"   className="button-groups"/>
+            <Image   id="generated-img" src={example} caption={"Generated Image"}  className="flex-row" />  {/* Display Image  */}
+          </div>
 
-          {/* Display Image  */}
-          <Image />
       </div>
     );
   }
