@@ -5,22 +5,15 @@ import Content  from './content';
 import Footer   from './footer';
 
 class App extends Component{
-    constructor(props){
-        super(props);
-        this.state ={
-            images: []
-        }
-    }
     render(){
         return(
             <div className="main-app container-fluid"> 
                 <Header />
-                <Uploader onLoad={images => this.setState({images})}/>
-                <Content  images={this.state.images} />
-                <Footer />
+                <Uploader />
+                <Content  />
+                <Footer   />
             </div>
         )
     }
 }
-
 export default App;
