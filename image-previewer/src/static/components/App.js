@@ -15,7 +15,7 @@ class App extends Component{
     }
     render(){
         return(
-            <div className="main-app container"> 
+            <div className="main-app container-fluid"> 
                 <Header />
                 <Uploader onLoad={images => this.setState({images})}/>
                 <Content  images={this.state.images} />

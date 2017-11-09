@@ -7,7 +7,7 @@ class Content extends Component{
   render(){
     const images = this.props.images;
     return (   
-        <div> 
+        <div className="container"> 
             <ul className="list-group">
               <SingleView img={example} />
               {images.length  ? images.map((image) => { return <SingleView img={image}/> }) : null}

@@ -22,9 +22,6 @@
     background-color: #EEEE;
 }
 
-.flex-item{
-    justify-content: space-between; 
-}
 .figure-img:hover{
     opacity: 0.7;
     background-color:#000;
