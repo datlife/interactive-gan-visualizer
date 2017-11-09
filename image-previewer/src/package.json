@@ -4,7 +4,7 @@
   "description": "Image Generator using Generative Adversarial Network",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server",
+    "dev": "webpack-dev-server --open",
     "build": "webpack --progress --verbose --colors --display-error-details",
     "build:production": "npm run clean && npm run build"
   },

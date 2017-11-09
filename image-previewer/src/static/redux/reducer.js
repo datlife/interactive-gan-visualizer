@@ -5,9 +5,10 @@ const SELECT_OBJECT = 'SELECT_OBJECT'
 const DRAG_OBJECT   = 'DRAG_OBJECT'
 
 // Action Creators
-function uploadImage(image){
+function uploadImage(images){
+    console.log("New Images are uploaded.");
     return {
         type: 'UPLOAD_IMAGE',
-        image
+        images: images
     }
 }

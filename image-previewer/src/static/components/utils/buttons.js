@@ -14,7 +14,6 @@ class Buttons extends React.Component{
                 <button id="process"   className="btn btn-success btn-large">Process</button>
             </div>
         </div>
-  
       )
     }
   }

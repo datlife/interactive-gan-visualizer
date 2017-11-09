@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import SingleView from './utils/single_item';
+import {connect} from 'react-redux';
 
+
+// Example : cute cat
 let example = {preview: require("../../assets/cute-cat.jpg")}
 
 class Content extends Component{
@@ -17,4 +20,10 @@ class Content extends Component{
   }
 } 
 
-export default Content;
+function mapStatesToProps(state){
+  return {
+    images = state.images
+  };
+}
+
+export default connect(mapStatesToProps)(Content);

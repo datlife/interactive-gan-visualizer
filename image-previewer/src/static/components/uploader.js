@@ -5,7 +5,7 @@ class Uploader extends Component{
     render(){
         return(
           <div className="row">
-            <div className="span6 center">
+            <div className="span6">
                 <Dropzone
                     className="dropzone"
                     accept="image/jpeg, image/png"
