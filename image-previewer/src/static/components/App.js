@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 
 import Header from './header';
+import Uploader from './uploader';
 import Content from './content';
 import Footer from './footer';
-import Uploader from './uploader';
 
-let example = require("../../assets/cute-cat.jpg");
 
 class App extends Component{
     constructor(props){
@@ -16,7 +15,7 @@ class App extends Component{
     }
     render(){
         return(
-            <div className="main-app container-fluid"> 
+            <div className="main-app container"> 
                 <Header />
                 <Uploader onLoad={images => this.setState({images})}/>
                 <Content  images={this.state.images} />

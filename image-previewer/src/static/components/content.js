@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import SingleView from './single_item';
+import SingleView from './utils/single_item';
 
 let example = {preview: require("../../assets/cute-cat.jpg")}
 
