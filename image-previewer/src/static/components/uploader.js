@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Dropzone from 'react-dropzone';
 
-
 class Uploader extends Component{
     render(){
         return(
