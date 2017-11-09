@@ -1,16 +1,20 @@
 import React, {Component} from 'react';
+import Dropzone from 'react-dropzone';
+
 
 class Uploader extends Component{
     render(){
         return(
-            <div className="row">
-            <div className="col-10" >
-              <form className="form-group">
-                    <input type="file" className="form-control" placeholder="Browse an image" />
-              </form>
-            </div>
-            <div className="col-2">
-              <button type="submit" className="btn btn-primary btn-large">Upload</button>
+          <div className="row">
+            <div className="span6 center">
+                <Dropzone
+                    className="dropzone"
+                    accept="image/jpeg, image/png"
+                    onDrop={(images) => this.props.onLoad(images)}>
+                    <div className="d-flex align-items-center">
+                        <p className="lead">Drop or Click to upload images.</p>
+                    </div>
+                </Dropzone>
             </div>
           </div>
         )

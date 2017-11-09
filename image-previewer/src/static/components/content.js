@@ -1,23 +1,20 @@
 import React, {Component} from 'react';
-import Image from './image';
-import Buttons from './buttons';
+import SingleView from './single_item';
 
-let example = require("../../assets/cute-cat.jpg");
-
+let example = {preview: require("../../assets/cute-cat.jpg")}
 
 class Content extends Component{
   render(){
-    return (
-      <div className="body container-fluid">
-          <div className="d-flex">
-            <Image   id="original-img"  src={example} caption={"Original Image"} className="flex-row" />  {/* Display Image  */}
-            <Buttons id="controllers"/>
-            <Image   id="generated-img" src={example} caption={"Generated Image"}  className="flex-row" />  {/* Display Image  */}
-          </div>
-
-      </div>
+    const images = this.props.images;
+    return (   
+        <div> 
+            <ul className="list-group">
+              <SingleView img={example} />
+              {images.length  ? images.map((image) => { return <SingleView img={image}/> }) : null}
+            </ul>
+        </div>
     );
   }
-}
+} 
 
 export default Content;
