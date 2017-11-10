@@ -1,7 +1,8 @@
 // This file is a configuration file for Webpack to 
-// 1. Built development server to test front-end code
-// 2.compile front-end javascripts into single bundle.js and  
-// css files into style.bundle.css for production. 
+//    1. Built development server to test front-end code
+//    2. Compile front-end javascripts into single bundle.js and  
+//        css files into style.bundle.css for production. 
+
 // When it is built properly, a folder ./dist should be appeared) 
 
 const path = require('path');
@@ -11,7 +12,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 // Constant with our paths
 const paths = {
   BUILD: path.resolve(__dirname, 'dist'),
-  SRC: path.resolve(__dirname, 'static'),  
+  SRC: path.resolve(__dirname, 'src'),  
 };
 
 // Webpack configuration

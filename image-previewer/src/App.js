@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import Header   from './header';
-import Uploader from './uploader';
-import Content  from './content';
-import Footer   from './footer';
+import Header   from './components/header';
+import Uploader from './components/uploader';
+import Content  from './components/content';
+import Footer   from './components/footer';
 
 class App extends Component{
     render(){

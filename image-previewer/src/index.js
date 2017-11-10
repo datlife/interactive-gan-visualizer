@@ -1,11 +1,14 @@
-// import style
-import  './styles/main.css';
+// This file will combines all react components + redux store + CSS
+// in order to generate necessary scripts to build the web app
+
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App';
-
 import {Provider} from 'react-redux';
-import Store from './store';
+
+import App from './App';
+import Store from './redux/store';
+
+import  './styles/main.css';
 
 ReactDOM.render(
    <Provider store={Store}>
