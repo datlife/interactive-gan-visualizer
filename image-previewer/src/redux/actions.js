@@ -6,20 +6,21 @@ export const DETECT_OBJECT   = 'DRAG_OBJECT'
 export const SELECT_OBJECT   = 'SELECT_OBJECT'
 export const DRAG_OBJECT     = 'DRAG_OBJECT'
 
+export const TOGGLE_DEBUG    = 'TOGGLE_DEBUG'
+
 // Action Creators
-// Def: an action creator need to create an action with a "type" and an "object"
 export function uploadImage(images){
-    console.log("New Images are uploaded." + images.length);
     return {
         type: UPLOAD_IMAGE,  
         images: images   
     }
 }
 
-export function deleteImage(image_id){
+export function deleteImage(id){
+    // console.log("Deleteing image id " + id);
     return {
         type: DELETE_IMAGE,  
-        image_id: image_id 
+        id: id
     }
 }
 
