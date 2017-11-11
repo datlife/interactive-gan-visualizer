@@ -14,7 +14,7 @@ body {
     margin: 0;
     padding-bottom: 6rem;
     min-height: 100%;
-    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Montserrat', 'Lato', 'Open Sans', 'Helvetica Neue', Helvetica, Calibri, Arial, sans-serif;
 }
 
 .span6{
@@ -32,12 +32,30 @@ body {
 
 .dropzone:hover {
     cursor: pointer;
-    background-color: rgba(168, 16, 16, 0.933);    
+    background-color: #ec2626;    
 }
-    
+
+.toggle{
+    font-size: 0.75em;
+}
+.list-group-item{
+    max-width: 100%;
+    margin: 0;
+
+}
 .list-group-item:hover{
     background-color: #EEEE;
 }
+
+.hover-btn {
+    position: absolute;
+    left: -1.25em;
+    top: -1.25em;
+    display: none;
+ }
+ .list-group-item:hover .hover-btn {
+    display: block;
+ }
 
 .figure-img:hover{
     opacity: 0.95;
@@ -48,21 +66,11 @@ body {
 }
 
 .footer {
-    position: absolute;
+    position: fixed;
     right: 0;
     bottom: 0;
     left: 0;
-    padding: 1rem;
+    padding: 0.75rem;
     background-color: #f5f5f5;
     text-align: center;
-  }
-  .hover-btn {
-     position: absolute;
-     left: -5px;
-     top: -10px;
-     display: none;
-  }
-
-  .list-group-item:hover .hover-btn {
-     display: block;
-  }
+}

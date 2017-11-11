@@ -9,10 +9,9 @@ import {deleteImage} from '../redux/actions';
 
 class Content extends Component{
   render(){
-    const images = this.props.images;
-    console.log(images);
+    let images = this.props.images;
     return (   
-        <div className="container"> 
+        <div className="container-fluid"> 
           <ul className="list-group">{
             images  
             ? images.map((image, id) => { return <SingleView  key={image.preview} id={id} 
