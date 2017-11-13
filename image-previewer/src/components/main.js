@@ -7,21 +7,6 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {deleteImage} from '../redux/actions';
 
-class Content extends Component{
-  render(){
-    let images = this.props.images;
-    return (   
-        <div className="container-fluid"> 
-          <ul className="list-group">{
-            images  
-            ? images.map((image, id) => { return <SingleView  key={image.preview} id={id} 
-                                                              img={image} removeItem={this.props.deleteImage} /> }) 
-            : null}
-          </ul>
-        </div>
-    );
-  }
-} 
 
 function mapStatesToProps(state){
   return {
@@ -33,5 +18,23 @@ function mapDispatchToProps(dispatch){
     deleteImage: deleteImage
   }, dispatch)
 }
+
+class Content extends Component{
+  render(){
+    let images = this.props.images;
+    return (   
+        <div className="container-fluid"> 
+          <ul className="list-group">{
+            images  
+            ? images.map((image, id) => { return <SingleView  key={image.preview} id={id} 
+                                                              img={image} 
+                                                              removeItem={this.props.deleteImage} /> }) 
+            : null}
+          </ul>
+        </div>
+    );
+  }
+} 
+
 
 export default connect(mapStatesToProps, mapDispatchToProps)(Content);

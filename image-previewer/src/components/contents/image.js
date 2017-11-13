@@ -1,40 +1,43 @@
 import React, {Component} from 'react';
-import {Layer, Stage, Image, Rect} from 'react-konva';
+import {Layer, Stage, Image, Group, Rect} from 'react-konva';
+
 
 class Photo extends Component {
   constructor(props) {
     super(props);
     this.state = {
       image: null,
-      bboxes: []
+      bboxes: null
     }
   }
 
   componentDidMount() {
     const image = new window.Image();
     image.src = this.props.img;
-    image.width = 300;
-    image.height = 300;
+    image.width = 400;
+    image.height = 400;
     image.onload = () => {
+      /* loading animation */
       this.setState({image: image});
     }
   }
-
+  
   render() {
     const caption = this.props.caption;
-
     return (
       <div className="photo-box">
-        <Stage width={300} height={300} className="figure-img">
+        <Stage width={400} height={400} className="figure-img">
           <Layer>{
             this.state.image
-              ? <Image image={this.state.image}/>
+              ? <Image ref="img" image={this.state.image}/>
+              : null}
+          </Layer>
+          <Layer>{this.state.bboxes
+              ? <Rect />
               : null}
           </Layer>
         </Stage>
-        <figcaption>
-          <p className="lead text-center">{caption}</p>
-        </figcaption>
+          <div className="caption lead text-center">{caption}</div>
       </div>
     );
   }

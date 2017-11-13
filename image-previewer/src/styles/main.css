@@ -43,6 +43,10 @@ body {
     margin: 0;
 
 }
+.d-flex{
+    padding-left: 0;
+    padding-right: 0;
+}
 .list-group-item:hover{
     background-color: #EEEE;
 }
@@ -57,12 +61,13 @@ body {
     display: block;
  }
 
+.caption{
+    padding-bottom: 0;
+}
 .figure-img:hover{
     opacity: 0.95;
-    filter: brightness(70%);
+    filter: brightness(90%);
     cursor: crosshair;
-    box-shadow: 3px 3px 3px 4px #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
-    
 }
 
 .footer {

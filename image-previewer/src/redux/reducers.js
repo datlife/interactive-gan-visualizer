@@ -4,22 +4,22 @@
 
 import {UPLOAD_IMAGE, DELETE_IMAGE} from './actions';
 
-export function ImageReducer(state = [], action){
+export function ImageReducer(images = [], action){
     if (action.type !== undefined) {
         switch(action.type){
             case UPLOAD_IMAGE:{
-                return state.concat(action.images)  
+                return images.concat(action.images)  
             }
             case DELETE_IMAGE:
             {
                 console.log(action);
-                return state.filter((img, id) => id !== action.id)
+                return images.filter((img, id) => id !== action.id)
             }
             default:
-                return state
+                return images
         }
     }  
-    return state     
+    return images   
 }
 
 
