@@ -9,9 +9,8 @@ import {deleteImage} from '../redux/actions/uploadImage';
 
 
 function mapStatesToProps(state){
-  console.log(state);
   return {
-    images: state.images,
+    objects: state.images,
   }
 }
 
@@ -21,7 +20,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Content extends Component{
   render(){
-    let images = this.props.images;
+    let images = this.props.objects;
     return (   
         <div className="container-fluid"> 
           <ul className="list-group">{
