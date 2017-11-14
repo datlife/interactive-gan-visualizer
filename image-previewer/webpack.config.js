@@ -36,13 +36,13 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: [
-          'babel-loader',
-        ],
+        exclude: /node_modules/,        
+        loader: 'babel-loader',
+        query: {
+          "presets": ["es2015", "stage-0", "react"]
+        },    
       },
       
-
       // CSS loader to CSS files 
       {
         test: /\.css$/,
@@ -50,11 +50,11 @@ module.exports = {
           use: 'css-loader?url=false',
         }),
       },
+
       {
         test: /\.(png|jpg)$/, 
         loader: 'file-loader', 
       }
-
     ],
   },
   // Enable importing JS files without specifying their's extenstion

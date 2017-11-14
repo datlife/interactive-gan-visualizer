@@ -4,14 +4,16 @@ import ReactDOM from 'react-dom';
 import React, { Component } from 'react';
 import {Provider} from 'react-redux';
 
-import Store from './redux/store';
+import configureStore from './redux/store';
 import App from './App';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import  './styles/main.css';
 
+const store = configureStore({});
+
 ReactDOM.render(
-   <Provider store={Store}>
+   <Provider store={store}>
       <App />
    </Provider>,
     document.getElementById('root')

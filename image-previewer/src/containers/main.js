@@ -1,23 +1,23 @@
 // React
 import React, {Component} from 'react';
-import SingleView from './contents/single_item';
+import SingleView from '../components/single_item';
 
 // Redux
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {deleteImage} from '../redux/actions';
+import {deleteImage} from '../redux/actions/uploadImage';
 
 
 function mapStatesToProps(state){
+  console.log(state);
   return {
-    images: state.images
+    images: state.images,
   }
 }
-function mapDispatchToProps(dispatch){
-  return bindActionCreators({
-    deleteImage: deleteImage
-  }, dispatch)
-}
+
+const mapDispatchToProps = (dispatch) => ({
+  deleteImage: bindActionCreators(deleteImage, dispatch),
+});
 
 class Content extends Component{
   render(){
@@ -25,8 +25,8 @@ class Content extends Component{
     return (   
         <div className="container-fluid"> 
           <ul className="list-group">{
-            images  
-            ? images.map((image, id) => { return <SingleView  key={image.preview} id={id} 
+            images.length  
+            ? images.map((image, id) => {return <SingleView  key={image.preview} id={id} 
                                                               img={image} 
                                                               removeItem={this.props.deleteImage} /> }) 
             : null}

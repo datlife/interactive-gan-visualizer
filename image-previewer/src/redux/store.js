@@ -1,16 +1,14 @@
-import {combineReducers, createStore} from 'redux';
-import {ImageReducer} from './reducers';
-// import {routerReducer} from 'react-router-redux';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
 
-const initial_state ={
-    images: [{name: 'car-2.jpg', 
-              preview: require("../../assets/car-2.jpg")}] // Example 
+import rootReducer from './reducers';
+
+
+const enhancer = compose(
+    applyMiddleware(thunk),
+     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  );
+export default function configureStore(initialState) {    
+    const store = createStore(rootReducer, initialState, enhancer);
+    return store;
 }
-
-const rootReducer = combineReducers({
-    images: ImageReducer
-});
-
-const Store = createStore(rootReducer, initial_state);
-
-export default Store;
