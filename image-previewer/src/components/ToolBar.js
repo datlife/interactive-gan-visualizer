@@ -11,24 +11,11 @@ import SaveIcon from 'material-ui/svg-icons/content/save';
 import {Card, IconButton, GridList, MenuItem, Slider, SelectField,
   Toggle, ToolbarSeparator, RaisedButton} from 'material-ui';
 
-import * as canvasActions from '../redux/actions/fabricCanvas';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-const mapStateToProps = (state) => ({
-  url: state.exportObject.url,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  canvasActions: bindActionCreators(canvasActions, dispatch),
-});
-
 
 class Toolbar extends React.Component {
   _addBox = () => {
-    console.log("generating new image");
+    console.log(this.props);
     let canvasActions = this.props.canvasActions;
-    console.log(canvasActions);
     const rect = new fabric.Rect({
       top: 10,
       left: 10,
@@ -69,9 +56,7 @@ class Toolbar extends React.Component {
   }
 }
 
-export default  connect(
-  mapStateToProps,
-  mapDispatchToProps)(Toolbar);
+export default Toolbar;
 
 // Toolbar.propTypes = {
 //   onToDataURL: PropTypes.func,

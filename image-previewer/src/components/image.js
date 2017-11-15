@@ -3,46 +3,34 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 import Canvas from './Canvas';
-import * as objectHandlerActions from '../redux/actions/objectHandler';
-import * as fabricCanvasActions from '../redux/actions/fabricCanvas';
-
 import {fabric} from 'fabric';
-
-const mapStateToProps = state => ({
-  fabricCanvas: state.fabricCanvas,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  objectHandlers: bindActionCreators(objectHandlerActions, dispatch),
-  fabricCanvasActions: bindActionCreators(fabricCanvasActions, dispatch),
-  
-});
 
 class Photo extends React.Component {
     componentDidMount(){
-      const { objectHandlers, fabricCanvasActions, img} = this.props;
-      let fabricCanvas =  new fabric.Canvas();
-      fabricCanvas.on('object:selected', (evt) => objectHandlers.selected(evt.target));
-      fabricCanvas.on('object:moving', (evt)   => objectHandlers.moving(evt.target));
-      fabricCanvas.on('object:modified', (evt) => objectHandlers.modified(evt.target));
-      fabricCanvas.on('object:scaling', (evt)  => objectHandlers.scaling(evt.target));
-      fabricCanvas.on('selection:cleared', ()  => objectHandlers.cleared());
+      const { objectHandlers, fabricCanvasActions, image} = this.props;
+      const {fabricCanvas} = this.props;
+      // const thisCanvas = fabricCanvas.byIds.id.canvas;
+      // thisCanvas.on('object:selected', (evt) => objectHandlers.selected(evt.target));
+      // thisCanvas.on('object:moving',   (evt) => objectHandlers.moving(evt.target));
+      // thisCanvas.on('object:modified', (evt) => objectHandlers.modified(evt.target));
+      // thisCanvas.on('object:scaling',  (evt) => objectHandlers.scaling(evt.target));
+      // thisCanvas.on('selection:cleared', ()  => objectHandlers.cleared());
 
-      fabric.Image.fromURL(img.preview, (img)=>{
-        fabricCanvasActions.addObject(img);
-      });
+      // // fabric.Image.fromURL(image.preview, (img)=>{
+      //   img.set({selectable: false, hasControls: false}); // not allow image to move
+      //   fabricCanvasActions.addObject(this.props.id, img);
+      // }, {crossOrigin: 'anonymous'});
     }
-      
-  
+
      render() {
-      const { fabricCanvasActions } = this.props;
-      
+      let { fabricCanvasActions,id, ...props } = this.props;
         return (
           <div>
-            <Canvas initialize={fabricCanvasActions.initialize} width={400} height={400} />
+            <Canvas id={id} initialize={fabricCanvasActions.initialize} width={400} height={400} {...props} />
+            <p className="lead text-center">{this.props.caption}</p>    
           </div>
         )
      }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Photo);
+export default Photo;

@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
 import Dropzone from 'react-dropzone';
+
+// Redux
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {uploadImage} from '../redux/actions/uploadImage';
-
-function mapStateToProps(state) {
-  return {images: state.images};
-}
+import {uploadImage} from '../redux/actions/imageHandler';
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({uploadImage}, dispatch)
@@ -31,4 +29,4 @@ class Uploader extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Uploader);
+export default connect(null, mapDispatchToProps)(Uploader);
