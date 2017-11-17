@@ -1,14 +1,12 @@
 import { combineReducers } from 'redux';
 
 import fabricCanvas from './fabricCanvas';
-import activeObject from './activeObject';
-import exportObject from './exportObject';
-import ImageReducer from './processImage';
+import updateBboxes from './updateBboxes';
+import ImageReducer from './processImages';
 
 const rootReducers = combineReducers({
-    fabricCanvas,
-    activeObject,
-    exportObject,
     images: ImageReducer,
+    bboxes: updateBboxes,
+    views:  fabricCanvas,
 });
 export default rootReducers;

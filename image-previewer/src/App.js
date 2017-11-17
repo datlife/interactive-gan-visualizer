@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Spinner from 'react-spinkit';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import Uploader from './containers/uploader';
 import Content from './containers/main';

@@ -6,10 +6,8 @@ import {fabric} from 'fabric';
 export default class Canvas extends React.Component {
   componentDidMount() {
     const {id, height, width} = this.props;
-    let canvas = new fabric.Canvas();
     const el = ReactDOM.findDOMNode(this);
-    canvas.initialize(el, height, width);    
-    this.props.initialize(id, canvas);
+    this.props.initialize(el, id, height, width);    
   }
 
   render() {

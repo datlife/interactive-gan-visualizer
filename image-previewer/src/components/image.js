@@ -26,7 +26,7 @@ class Photo extends React.Component {
       let { fabricCanvasActions,id, ...props } = this.props;
         return (
           <div>
-            <Canvas id={id} initialize={fabricCanvasActions.initialize} width={400} height={400} {...props} />
+            <Canvas id={id} initialize={fabricCanvasActions.initialize} width={400} height={400}  />
             <p className="lead text-center">{this.props.caption}</p>    
           </div>
         )

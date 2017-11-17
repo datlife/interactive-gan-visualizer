@@ -2,7 +2,7 @@ import {handleActions} from 'redux-actions';
 import dotProp from "dot-prop-immutable";
 import * as types from '../constants';
 
-const initialState = {
+const initial_canvas_state = {
     byId: {},
     allIds: []
 };
@@ -11,7 +11,7 @@ export default handleActions({
     [types.CANVAS_INITIALIZE]: (state, action) => initialize(state, action),
     [types.CANVAS_REFRESH]:    (state, action) => (state.map(obj =>(obj.id == action.id) ? obj.canvas.renderAll() : null)),
     [types.ADD_OBJECT]:        (state, action) => state
-}, initialState);
+}, initial_canvas_state);
 
 
 function initialize(state, action){
