@@ -13,9 +13,9 @@ import {Card, IconButton, GridList, MenuItem, Slider, SelectField,
 
 
 class Toolbar extends React.Component {
+
   _addBox = () => {
-    console.log(this.props);
-    let canvasActions = this.props.canvasActions;
+    let {canvas_id, actions} = this.props;
     const rect = new fabric.Rect({
       top: 10,
       left: 10,
@@ -23,11 +23,11 @@ class Toolbar extends React.Component {
       height: 10,
       fill: 'red',
     });
-    canvasActions.addObject(rect);    
+    actions.addObject(canvas_id, rect);    
   }
 
   _save(){
-    this.props.canvasActions.toDataURL();    
+    this.props.actions.toDataURL();    
   }
 
   render() {
@@ -37,16 +37,17 @@ class Toolbar extends React.Component {
           <div className="d-flex flex-column">
             <RaisedButton className="mt-0" label="Clear" primary={true}/>
             <RaisedButton className="mt-2" label="Process" secondary={true}/>
-            <Toggle       className="mt-3 toggle" label="Debug" onToggle={(e) => this.props.toggleDebug(e)}/>
+            <Toggle       className="mt-3 toggle" label="Debug" 
+                          onToggle={(e) => this.props.toggleDebug()}/>
           </div>
         </div>
 
         <div className="p-2">
           <Card className="d-flex flex-column">
-            <IconButton className="mt-0" onClick={this._addBox}>
+            <IconButton className="mt-0" onClick={this._addBox.bind(this)}>
                 <CropIcon />
             </IconButton>
-            <IconButton className="mt-0" onClick={this._save}>
+            <IconButton className="mt-0" onClick={this._save.bind(this)}>
                 <SaveIcon/>
             </IconButton>
           </Card>
@@ -57,9 +58,3 @@ class Toolbar extends React.Component {
 }
 
 export default Toolbar;
-
-// Toolbar.propTypes = {
-//   onToDataURL: PropTypes.func,
-//   onAddObject: PropTypes.func,
-//   url: PropTypes.string,
-// };

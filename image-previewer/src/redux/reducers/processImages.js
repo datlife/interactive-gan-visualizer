@@ -3,13 +3,57 @@
 // Ref: https://hackernoon.com/redux-patterns-add-edit-remove-objects-in-an-array-6ee70cab2456
 
 import * as types from '../constants';
-import { handleActions } from 'redux-actions';
+import {combineReducers} from 'redux';
 
-const initial_state = [];
+export default combineReducers({
+    byId: byId,
+    allIds: allIds
+})
 
-export default handleActions({
-    [types.UPLOAD_IMAGE]: (state, action) => state.concat(action.new_images),
-    [types.DELETE_IMAGE]: (state, action) => state.filter((img, id) => id !== action.id),
+function byId(state = {}, action){
+    let new_images = action.new_images;
 
-}, initial_state);
+    switch(action.type){
+        case types.UPLOAD_IMAGE:{
+            return new_images.reduce(function(state, image){
+                const img_id = image.preview.split("/").pop(); // get the last element of array
+                return {
+                    ...state,
+                    [img_id]:{ ...state[img_id],
+                        id: img_id, 
+                        original: image.preview,
+                        generated: image.preview,
+                        debug: image.preview,
+                        bboxes: [],
+                        isDebugging: false,  
+                    }
+                }
+            }, {})
 
+        }
+
+        case types.DELETE_IMAGE: 
+            return state
+
+        default:
+            return state
+    }
+}
+
+
+function allIds(state=[], action){
+    let new_images = action.new_images;
+    
+    switch(action.type){
+        case types.UPLOAD_IMAGE:{
+            return new_images.reduce(function(state, image){
+                const img_id = image.preview.split("/").pop(); // get the last element of array                
+                return [...state, img_id]}, {})
+        }
+        case types.DELETE_IMAGE: 
+            return state
+
+        default:
+            return state
+    }
+}

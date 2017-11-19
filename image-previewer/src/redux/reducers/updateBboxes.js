@@ -2,11 +2,8 @@ import { handleActions } from 'redux-actions';
 import * as types from '../constants';
 
 const initialState = {
-  type: null,
-  left: 0,
-  top: 0,
-  width: 0,
-  height: 0,
+  byIds:{},
+  allIds:[]
 };
 
 export default handleActions({
