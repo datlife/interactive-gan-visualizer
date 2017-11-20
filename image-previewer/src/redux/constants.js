@@ -1,6 +1,7 @@
 // Define actions
-export const UPLOAD_IMAGE = 'UPLOAD_IMG'
-export const DELETE_IMAGE = 'DELETE_IMG'
+export const UPLOAD_IMAGE = 'UPLOAD_IMG';
+export const DELETE_IMAGE = 'DELETE_IMG';
+export const TOGGLE_DEBUG  = 'TOGGLE_DEBUG';
 
 export const CANVAS_INITIALIZE = 'CANVAS_INITIALIZE';
 export const CANVAS_REFRESH = 'CANVAS_REFRESH';
@@ -17,6 +18,3 @@ export const OBJECT_SET_LEFT = 'OBJECT_SET_LEFT';
 export const OBJECT_SET_TOP = 'OBJECT_SET_TOP';
 export const OBJECT_SET_WIDTH = 'OBJECT_SET_WIDTH';
 export const OBJECT_SET_HEIGHT = 'OBJECT_SET_HEIGHT';
-
-export const TOGGLE_DEBUG  = 'TOGGLE_DEBUG';
-

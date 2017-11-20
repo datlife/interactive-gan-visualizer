@@ -5,19 +5,18 @@ import SingleView from '../components/SingleView';
 // Redux
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {deleteImage} from '../redux/actions/imageHandler';
 import * as objectHandlerActions from '../redux/actions/bboxHandler';
 import * as fabricCanvasActions from '../redux/actions/fabricCanvasHandler';
+import * as ImageHandler from '../redux/actions/imageHandler';
 
 function mapStatesToProps(state){
   return {
     images: state.images,
-    bboxes: state.bboxes,
-    views: state.views,  
   }
 }
+
 const mapDispatchToProps = (dispatch) => ({
-  deleteImage: bindActionCreators(deleteImage, dispatch),
+  ImageHandler: bindActionCreators(ImageHandler, dispatch),
   objectHandlers: bindActionCreators(objectHandlerActions, dispatch),
   fabricCanvasActions: bindActionCreators(fabricCanvasActions, dispatch),
 });
@@ -36,7 +35,6 @@ class Content extends React.Component{
     let {images, ...props} = this.props;
     return (   
         <div className="container-fluid"> 
-          {console.log("loading view")}
           <ul className="list-group">{
             images.allIds.length  
             ? images.allIds.map((id) => {

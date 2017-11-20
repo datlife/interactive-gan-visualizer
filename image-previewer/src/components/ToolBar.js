@@ -15,30 +15,34 @@ import {Card, IconButton, GridList, MenuItem, Slider, SelectField,
 class Toolbar extends React.Component {
 
   _addBox = () => {
-    let {canvas_id, actions} = this.props;
+    let {canvas_id, fabricCanvasActions} = this.props;
     const rect = new fabric.Rect({
       top: 10,
       left: 10,
-      width: 10,
-      height: 10,
-      fill: 'red',
+      width: 50,
+      height: 50,
+      hasBorder: true,
+      stroke: 'yellow',
+      strokeWidth: 3,
+      fill:'transparent'
     });
-    actions.addObject(canvas_id, rect);    
+    fabricCanvasActions.addObject(canvas_id, rect);    
   }
 
   _save(){
-    this.props.actions.toDataURL();    
+    this.props.fabricCanvasActions.toDataURL();    
   }
 
   render() {
+    let {canvas_id, ImageHandler, isDebugging} = this.props;
     return (
       <div className="d-flex flex-row">
         <div className="p-2">
           <div className="d-flex flex-column">
-            <RaisedButton className="mt-0" label="Clear" primary={true}/>
+            <RaisedButton className="mt-0" label="Detect" primary={true}/>
             <RaisedButton className="mt-2" label="Process" secondary={true}/>
             <Toggle       className="mt-3 toggle" label="Debug" 
-                          onToggle={(e) => this.props.toggleDebug()}/>
+                          onToggle={(e) => ImageHandler.changeDebugMode(canvas_id, isDebugging)}/>
           </div>
         </div>
 

@@ -2,11 +2,10 @@ import * as types from '../constants';
 import {fabric} from 'fabric';
 
 
-export const initialize = (el, id, canvas, background) => (dispatch, getState) => {
+export const initialize = (id, canvas) => (dispatch, getState) => {
     dispatch({
         type: types.CANVAS_INITIALIZE, 
         id: id,
-        background: background,
         canvas: canvas}); 
 };
 

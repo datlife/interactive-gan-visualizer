@@ -32,7 +32,6 @@ function allIds(state = [], action) {
         ...state,
         action.id
       ]
-
     case types.DELETE_IMAGE:
       return state
 
@@ -42,13 +41,7 @@ function allIds(state = [], action) {
 }
 
 function init(state, action){
-  let {id, background, canvas} = action;
-
-  fabric.Image.fromURL(background, (background)=>{
-    background.set({selectable: false, hasControls: false}); // not allow image to move
-    canvas.add(background);
-  }, {crossOrigin: 'anonymous'});
-
+  let {id, canvas} = action;
   return {
     ...state,[id]: 
     {

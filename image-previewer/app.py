@@ -1,7 +1,10 @@
+import sys, path
 from flask import Flask, render_template
 from models import load_model
 
 app = Flask(__name__)
+
+MODEL = './assest/car_detection.mb'
 
 @app.route('/')
 def load_main_page():

@@ -13,42 +13,36 @@ class SingleView extends React.Component {
         *Generated toolbars and image views
         * Update canvas view if there is an event triggered
   */
-  constructor(props){
-    super(props);
-    this.isDebugging = false;
-    this.toggleDebug = this.toggleDebug.bind(this);
-  }
   render() {
-    let {image, id, deleteImage,...props} = this.props;    
+    let {image, id, ...props} = this.props;    
+    let {ImageHandler} = this.props;
+
     return (
-      <div className={this.isDebugging? "" : "container"}> {/* to expand the view */}
+      <div className={image.isDebugging? "true" : "container"}> {/* to expand the view */}
         <li className="d-flex list-group-item">
             <div className="align-self-start col-2">
-              <Toolbar id="toolbar" toggleDebug={this.toggleDebug} actions={this.props.fabricCanvasActions} canvas_id={id}/>
+              <Toolbar canvas_id={id} {...props} isDebugging={image.isDebugging}/>
             </div>
-            {console.log("in single view")}
             <div className="col-10">
               <div className="d-flex flex-row justify-content-between">
                 {/* Render Images (orginal, mask for debugging, result) */}
                 <div className="p-2"><Photo id={id}  background={image.original}  caption={"Original Image"} {...props}/> </div>
                 <div className="p-2"><Photo id={`generated-${id}`} background={image.generated} caption={"Generated Image"}  {...props}/> </div>
-                {this.isDebugging
+                {image.isDebugging
                   ? <div className="p-2"><Photo id={`debug-${id}`}  src={image.debug} caption={"Debug"}  {...props}/></div>
                   : null}
               </div>
             </div>
           <div className="hover-btn">
-            <FloatingActionButton mini={true} onClick={() => deleteImage(id)}>
+            <FloatingActionButton mini={true} onClick={() => ImageHandler.deleteImage(id)}>
               <RemoveCircle/>
             </FloatingActionButton>
+            {/* {console.log(this.props.views.byId)}  */}
+
           </div>
         </li>
       </div>
     )
-  }
-
-  toggleDebug(){
-    this.isDebugging = !this.isDebugging;
   }
 }
 
