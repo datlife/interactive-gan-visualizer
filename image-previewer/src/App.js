@@ -1,32 +1,20 @@
-import React, {Component} from 'react';
-import Spinner from 'react-spinkit';
+import React  from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import Uploader from './containers/uploader';
-import Content from './containers/main';
+import Header   from './components/Header';
+import Uploader from './containers/Uploader';
+import Content  from './containers/Main';
+import Footer   from './components/Footer';
 
-class App extends Component {
+class App extends React.Component {
   render() {
     return (
       <MuiThemeProvider>
         <div className="main-app container-fluid">
-          <header id="header">
-            <div className="container">
-                <hr className="my-3" />
-                <h4 className="display-4 font-weight-bold text-right">Interactive Image Generator</h4>
-                <p className="lead text-right">with Generative Adversarial Network</p>
-                <hr className="my-3" />
-            </div>
-          </header>
-
+              <Header />
               <Uploader/>
               <Content/>
-
-          <footer className="footer">
-            <div className="text-center">
-                  <p className="lead">UC Davis - Fall 2017</p>
-            </div>
-          </footer>        
+              <Footer />
         </div>
       </MuiThemeProvider>
     )

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Dropzone from 'react-dropzone';
 
 // Redux
@@ -10,7 +10,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({uploadImage}, dispatch)
 }
 
-class Uploader extends Component {
+class Uploader extends React.Component {
   render() {
     return (
       <div className="row">
