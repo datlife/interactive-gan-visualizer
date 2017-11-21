@@ -29,8 +29,10 @@ function byId(state = {}, action) {
         }, state);
       }
 
-    case types.DELETE_IMAGE:
-      return state
+    case types.DELETE_IMAGE:{
+        let {[action.id]: any, ...new_state} = state;
+        return new_state;
+      }
 
     case 'TOGGLE_DEBUG':
       return {
@@ -60,7 +62,9 @@ function allIds(state = [], action) {
         }, state);
       }
     case types.DELETE_IMAGE:
-      return state
+    {
+      return state.filter(id => id !== action.id);
+    }
 
     default:
       return state

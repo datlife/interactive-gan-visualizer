@@ -8,9 +8,7 @@ export const uploadImage = (new_images) => (dispatch, getState) => {
 }
 
 export const deleteImage = (id) => (dispatch, getState) => {
-  dispatch({
-    type: DELETE_IMAGE, 
-    id: id});
+  dispatch({type: DELETE_IMAGE, id: id});
 }
 
 export const changeDebugMode = (id, debug) => (dispatch, getState) => {
