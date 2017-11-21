@@ -19,25 +19,27 @@ class SingleView extends React.Component {
 
     return (
       <div className={image.isDebugging? "true" : "container"}> {/* to expand the view */}
+
         <li className="d-flex list-group-item">
-            <div className="align-self-start col-2">
-              <Toolbar canvas_id={id} {...props} isDebugging={image.isDebugging}/>
+
+          <div className="align-self-start col-2">
+            <Toolbar canvas_id={id} {...props} isDebugging={image.isDebugging}/>
+          </div>
+
+          <div className="col-10">
+            <div className="d-flex flex-row justify-content-between">
+              <div className="p-2"><Photo id={id}  background={image.original}  caption={"Original Image"} {...props}/> </div>
+              <div className="p-2"><Photo id={`generated-${id}`} background={image.generated} caption={"Generated Image"}  {...props}/> </div>
+              {image.isDebugging
+                ? <div className="p-2"><Photo id={`debug-${id}`}  src={image.debug} caption={"Debug"}  {...props}/></div>
+                : null}
             </div>
-            <div className="col-10">
-              <div className="d-flex flex-row justify-content-between">
-                {/* Render Images (orginal, mask for debugging, result) */}
-                <div className="p-2"><Photo id={id}  background={image.original}  caption={"Original Image"} {...props}/> </div>
-                <div className="p-2"><Photo id={`generated-${id}`} background={image.generated} caption={"Generated Image"}  {...props}/> </div>
-                {image.isDebugging
-                  ? <div className="p-2"><Photo id={`debug-${id}`}  src={image.debug} caption={"Debug"}  {...props}/></div>
-                  : null}
-              </div>
-            </div>
+          </div>
+
           <div className="hover-btn">
             <FloatingActionButton mini={true} onClick={() => ImageHandler.deleteImage(id)}>
               <RemoveCircle/>
             </FloatingActionButton>
-            {/* {console.log(this.props.views.byId)}  */}
 
           </div>
         </li>

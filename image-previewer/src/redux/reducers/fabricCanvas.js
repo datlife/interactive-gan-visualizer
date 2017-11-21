@@ -7,17 +7,15 @@ export default combineReducers({byId: byId, allIds: allIds})
 
 function byId(state = {}, action) {
   switch (action.type) {
-    case types.CANVAS_INITIALIZE: return init(state, action)
-    case types.CANVAS_REFRESH:
-      // return dotProp.set(state, `byId[${action.id}].canvas`, state[action.id].renderAll());
-      return state;
-
-    case types.ADD_OBJECT:{
-      // fabricObject.canvas.setActiveObject(obj); 
-      return {
-        ...state,
-        [action.id]:{...state[action.id], canvas: state[action.id].canvas.add(action.object)}
-      }
+    case types.CANVAS_INITIALIZE:{ return init(state, action);}
+    case types.CANVAS_REFRESH:   { return state;}
+    case types.ADD_OBJECT: {
+      return {...state,
+              [action.id]: 
+                {...state[action.id], 
+                 canvas: action.canvas
+                }
+              };
     }
     default:
       return state
@@ -25,7 +23,6 @@ function byId(state = {}, action) {
 }
 
 function allIds(state = [], action) {
-
   switch (action.type) {
     case types.CANVAS_INITIALIZE:
       return [
@@ -41,10 +38,10 @@ function allIds(state = [], action) {
 }
 
 function init(state, action){
-  let {id, canvas} = action;
+  let {id, canvas} = action;  
   return {
     ...state,[id]: 
-    {
+    {...state[id],
       id: id,
       canvas: canvas
     }

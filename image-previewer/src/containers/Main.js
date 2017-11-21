@@ -12,6 +12,8 @@ import * as ImageHandler from '../redux/actions/imageHandler';
 function mapStatesToProps(state){
   return {
     images: state.images,
+    views:  state.views,
+    
   }
 }
 
