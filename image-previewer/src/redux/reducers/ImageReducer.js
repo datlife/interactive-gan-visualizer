@@ -21,7 +21,6 @@ function byId(state = {}, action) {
               id: img_id,
               original: image.preview,
               generated: image.preview,
-              // debug: image.preview,
               bboxes: [],
               isDebugging: false
             }

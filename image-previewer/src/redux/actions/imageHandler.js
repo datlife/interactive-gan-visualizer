@@ -11,10 +11,10 @@ export const deleteImage = (id) => (dispatch, getState) => {
   dispatch({type: DELETE_IMAGE, id: id});
 }
 
-export const changeDebugMode = (id, debug) => (dispatch, getState) => {
+export const changeDebugMode = (id, current_debug_mode) => (dispatch, getState) => {
   dispatch({
     type: 'TOGGLE_DEBUG',
     id: id,
-    debug: !debug
+    debug: !current_debug_mode
   });
 }

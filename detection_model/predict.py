@@ -2,27 +2,15 @@ import argparse
 import os
 import re
 import cv2
-import keras.backend as K
-import numpy as np
-import tensorflow as tf
-
-from models.YOLOv2 import YOLOv2
-from models.FeatureExtractor import FeatureExtractor
-
-from utils.draw_boxes import DrawingBox
-from utils.preprocess_img import preprocess_img
-from utils.visualize import draw_bboxes
-
 from cfg import ANCHORS, IMG_INPUT_SIZE, FEATURE_EXTRACTOR, N_CLASSES, CATEGORIES
-
 
 parser = argparse.ArgumentParser("Over-fit model to validate loss function")
 
 parser.add_argument('-p', '--path',
-                    help="Path to image file", type=str, default=None)
+                    help="Path to image file", type=str, default='example.jpg')
 
 parser.add_argument('-w', '--weights',
-                    help="Path to pre-trained weight files", type=str, default=None)
+                    help="Path to pre-trained weight files", type=str, default='coco_yolov2.weights')
 
 parser.add_argument('-o', '--output-path',
                     help="Save image to output directory", type=str, default=None)
@@ -33,6 +21,16 @@ parser.add_argument('-i', '--iou',
 parser.add_argument('-t', '--threshold',
                     help="Threshold value to display box", type=float, default=0.6)
 
+
+import numpy as np
+import tensorflow as tf
+import keras.backend as K
+from models.YOLOv2 import YOLOv2
+from models.FeatureExtractor import FeatureExtractor
+
+from utils.draw_boxes import DrawingBox
+from utils.preprocess_img import preprocess_img
+from utils.visualize import draw_bboxes
 
 def _main_():
     # ###############
@@ -110,7 +108,7 @@ def _main_():
         for box, cls, score in zip(pred_bboxes, pred_classes, pred_scores):
             y1, x1, y2, x2 = box
             bboxes.append(DrawingBox(x1, y1, x2, y2, class_names[cls], score))
-            print("Found {} with {:2.1f}% on image {}".format(class_names[cls], score*100, IMG_PATH.split('/')[-1]))
+            print("Found {} with {:2.1f}% on {}".format(class_names[cls], score*100, IMG_PATH.split('/')[-1]))
 
         # Save image to evaluation dir
         if OUTPUT is not None:

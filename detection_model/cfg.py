@@ -8,8 +8,8 @@ N_CLASSES = 80
 N_ANCHORS = 5
 
 # Map indices to actual label names - absolute path required
-CATEGORIES = "/home/dat/Documents/yolov2/dataset/coco/categories.txt"
-ANCHORS    = "/home/dat/Documents/yolov2/dataset/coco/anchors.txt"
+CATEGORIES = "coco_categories.txt"
+ANCHORS    = "coco_anchors.txt"
 
 
 # Type of Feature Extractor.
