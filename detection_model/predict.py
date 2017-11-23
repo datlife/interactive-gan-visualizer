@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import cv2
+
 from cfg import ANCHORS, IMG_INPUT_SIZE, FEATURE_EXTRACTOR, N_CLASSES, CATEGORIES
 
 parser = argparse.ArgumentParser("Over-fit model to validate loss function")
@@ -31,6 +32,7 @@ from models.FeatureExtractor import FeatureExtractor
 from utils.draw_boxes import DrawingBox
 from utils.preprocess_img import preprocess_img
 from utils.visualize import draw_bboxes
+
 
 def _main_():
     # ###############
@@ -113,7 +115,7 @@ def _main_():
         # Save image to evaluation dir
         if OUTPUT is not None:
             result = draw_bboxes(orig_img, bboxes)
-            result.save(os.path.join(OUTPUT, IMG_PATH.split('/')[-1]))
+            result.save(os.path.join(OUTPUT, IMG_PATH.split('/')[-1].split('.')[0] + '_result.jpg'))
 
 
 if __name__ == "__main__":
