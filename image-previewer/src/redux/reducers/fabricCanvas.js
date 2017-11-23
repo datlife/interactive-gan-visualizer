@@ -15,18 +15,18 @@ function byId(state = {}, action) {
           [id]: {
             ...state[id],
             id: id,
-            canvas: canvas
+            canvas: canvas   
           }
         }
       }
     case types.ADD_OBJECT:
       {
-        let {id, canvas} = action;
+        let {id, object} = action;
         return {
           ...state,
           [id]: {
             ...state[id],
-            canvas: canvas
+            canvas:  {...state[id].canvas, objects: [...state[id].canvas.objects, object]}
           }
         };
       }

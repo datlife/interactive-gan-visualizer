@@ -14,9 +14,8 @@ class SingleView extends React.Component {
         * Update canvas view if there is an event triggered
   */
   render() {
-    let {image, id, ...props} = this.props;    
+    let {image, views, id, ...props} = this.props;    
     let {ImageHandler} = this.props;
-
     return (
       <div className={image.isDebugging? "true" : "container"}> {/* to expand the view */}
 
@@ -28,10 +27,24 @@ class SingleView extends React.Component {
 
           <div className="col-10">
             <div className="d-flex flex-row justify-content-between">
-              <div className="p-2"><Photo id={id}  background={image.original}  caption={"Original Image"} {...props}/> </div>
-              <div className="p-2"><Photo id={`generated-${id}`} background={image.generated} caption={"Generated Image"}  {...props}/> </div>
+
+              <div className="p-2"><Photo 
+                                      id={id}
+                                      background={image.original}  
+                                      fabricCanvas={views.byId[id]}
+                                      caption={"Original Image"} {...props}/> </div>
+
+              <div className="p-2"><Photo 
+                                      id={`generated-${id}`} 
+                                      background={image.generated} 
+                                      fabricCanvas={views.byId[`generated-${id}`]}
+                                      caption={"Generated Image"}  {...props}/> </div>
               {image.isDebugging
-                ? <div className="p-2"><Photo id={`debug-${id}`}  src={image.debug} caption={"Debug"}  {...props}/></div>
+                ? <div className="p-2"><Photo 
+                                          id={`debug-${id}`}  
+                                          background={image.debug} 
+                                          fabricCanvas={views.byId[`debug-${id}`]}
+                                          caption={"Debug Image"}  {...props}/></div>
                 : null}
             </div>
           </div>
