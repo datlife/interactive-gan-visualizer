@@ -7,31 +7,21 @@ import CropIcon from 'material-ui/svg-icons/image/crop-free';
 import UndoIcon from 'material-ui/svg-icons/content/undo';
 import RedoIcon from 'material-ui/svg-icons/content/redo';
 import SaveIcon from 'material-ui/svg-icons/content/save';
-
 import {Card, IconButton, GridList, MenuItem, Slider, SelectField,
   Toggle, ToolbarSeparator, RaisedButton} from 'material-ui';
 
 
+// Redux
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import * as fabricCanvasActions from '../redux/actions/fabricCanvasHandler';
+
+const mapDispatchToProps = (dispatch) => ({
+  fabricCanvasActions: bindActionCreators(fabricCanvasActions, dispatch),
+});
+
+
 class Toolbar extends React.Component {
-
-  _addBox = () => {
-    let {canvas_id, fabricCanvasActions} = this.props;
-    const rect = new fabric.Rect({
-      top: 10,
-      left: 10,
-      width: 50,
-      height: 50,
-      hasBorder: true,
-      stroke: 'yellow',
-      strokeWidth: 3,
-      fill:'transparent'
-    });
-    fabricCanvasActions.addObject(canvas_id, rect);    
-  }
-
-  _save(){
-    this.props.fabricCanvasActions.toDataURL();    
-  }
 
   render() {
     let {canvas_id, ImageHandler, isDebugging} = this.props;
@@ -59,6 +49,25 @@ class Toolbar extends React.Component {
       </div>
     )
   }
+
+  _addBox = () => {
+    let {canvas_id, fabricCanvasActions} = this.props;
+    const rect = new fabric.Rect({
+      top: 10,
+      left: 10,
+      width: 50,
+      height: 50,
+      hasBorder: true,
+      stroke: 'yellow',
+      strokeWidth: 3,
+      fill:'transparent'
+    });
+    fabricCanvasActions.addObject(canvas_id, rect);    
+  }
+
+  _save(){
+    this.props.fabricCanvasActions.toDataURL();    
+  }
 }
 
-export default Toolbar;
+export default connect(null, mapDispatchToProps)(Toolbar);

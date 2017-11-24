@@ -1,28 +1,16 @@
-// React
 import React from 'react';
 import SingleView from '../components/SingleView';
 
 // Redux
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as objectHandlerActions from '../redux/actions/bboxHandler';
-import * as fabricCanvasActions from '../redux/actions/fabricCanvasHandler';
-import * as ImageHandler from '../redux/actions/imageHandler';
 
 function mapStatesToProps(state){
   return {
     images: state.images,
-    bboxes: state.bboxes,
-    views:  state.views,
+    views:  state.views
   }
 }
-
-const mapDispatchToProps = (dispatch) => ({
-  ImageHandler: bindActionCreators(ImageHandler, dispatch),
-  objectHandlers: bindActionCreators(objectHandlerActions, dispatch),
-  fabricCanvasActions: bindActionCreators(fabricCanvasActions, dispatch),
-});
-
 
 class Content extends React.Component{
   /*
@@ -34,7 +22,7 @@ class Content extends React.Component{
        5. other states (debug toggle, etc)
   */
   render(){
-    let {images,bboxes,...props} = this.props;
+    let {images, ...props} = this.props;
     return (   
         <div className="container-fluid"> 
           <ul className="list-group">{
@@ -42,8 +30,7 @@ class Content extends React.Component{
             ? images.allIds.map((id) => {
                   return <SingleView  key={id} id={id} 
                                       image={images.byId[id]} 
-                                      bboxes={bboxes.byId[id]}
-                                      {...props} /> }) 
+                                      {...props}/> }) 
             : null}
           </ul>
         </div>
@@ -51,4 +38,4 @@ class Content extends React.Component{
   }
 } 
 
-export default connect(mapStatesToProps, mapDispatchToProps)(Content);
+export default connect(mapStatesToProps, null)(Content);

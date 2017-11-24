@@ -1,18 +1,28 @@
 import React from 'react';
 import {fabric} from 'fabric';
 
+// Redux
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import * as fabricCanvasActions from '../redux/actions/fabricCanvasHandler';
+
+
+const mapDispatchToProps = (dispatch) => ({
+  fabricCanvasActions: bindActionCreators(fabricCanvasActions, dispatch),
+});
+
+
 class Photo extends React.Component {
     constructor(props){
       super(props);
       this.fabricCanvas = new fabric.Canvas();
     }
 
-    componentDidMount(){
-      let canvas = this.fabricCanvas;
-      
+    componentDidMount(){  
       const {background, id} = this.props;
       const {fabricCanvasActions, objectHandlers} = this.props;  
 
+      let canvas = this.fabricCanvas;
       canvas.initialize(this.refs.canvas, {width: 400, height:400});
 
       fabric.Image.fromURL(background, function(image){
@@ -21,16 +31,58 @@ class Photo extends React.Component {
         fabricCanvasActions.initialize(id, canvas);                
       }.bind(canvas),{ crossOrigin: 'Anonymous' });
 
-    canvas.on('object:selected', (evt) => objectHandlers.selected(evt.target));
-    canvas.on('object:moving',   (evt) => objectHandlers.moving(evt.target));
-    canvas.on('object:modified', (evt) => objectHandlers.modified(evt.target));
-    canvas.on('object:scaling',  (evt) => objectHandlers.scaling(evt.target));
-    canvas.on('selection:cleared', ()  => objectHandlers.cleared()); 
-    console.log("did mount " + id);      
+      console.log("Mounted");
     } 
-    componentDidUpdate(){
-      let {id, fabricCanvas, bboxes, background} = this.props;
-      let canvas = this.fabricCanvas;
+
+
+    reload(){
+      let {view, id} = this.props;
+      if(view){
+        let {id,bboxes, background} = this.props;
+        let canvas = this.fabricCanvas;
+        canvas.loadFromJSON(view.canvas);
+
+      }
+      console.log("Reloading " + id )
+        
+    }
+
+    render() {    
+      this.reload();
+      return (
+        <div>
+        <canvas ref="canvas" />
+        <p className="lead text-center">{this.props.caption}</p>   
+        </div>
+      )
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+      if (JSON.stringify(this.fabricCanvas) === nextProps.view.canvas){
+        return false;
+      }
+      return true;
+    }
+}
+
+export default connect(null, mapDispatchToProps)(Photo);
+
+
+
+
+// if(fabricCanvas){
+//   canvas.loadFromJSON(fabricCanvas.canvas);
+// }
+// canvas.loadFromJSON(fabricCanvas.canvas, function(){
+//   fabric.Image.fromURL(background, function(image){
+//     canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
+//       width: 400, height:400, 
+//       hasControls: false, selectable: false
+//    });
+//   },{});
+//   canvas.renderAll();
+// }.bind(canvas));    
+
       
       // fabricCanvas.add(object);
       // fabricCanvas.setActiveObjesct(object);
@@ -50,33 +102,9 @@ class Photo extends React.Component {
       //     canvas.renderAll();
       //   });
 
-        
-    }
 
-    render() {    
-      return (
-        <div>
-        <canvas ref="canvas" />
-        <p className="lead text-center">{this.props.caption}</p>   
-        </div>
-      )
-    }
-}
-
-export default Photo;
-
-
-
-
-// if(fabricCanvas){
-//   canvas.loadFromJSON(fabricCanvas.canvas);
-// }
-// canvas.loadFromJSON(fabricCanvas.canvas, function(){
-//   fabric.Image.fromURL(background, function(image){
-//     canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
-//       width: 400, height:400, 
-//       hasControls: false, selectable: false
-//    });
-//   },{});
-//   canvas.renderAll();
-// }.bind(canvas));    
+            // canvas.on('object:selected', (evt) => objectHandlers.selected(evt.target));
+      // canvas.on('object:moving',   (evt) => objectHandlers.moving(evt.target));
+      // canvas.on('object:modified', (evt) => objectHandlers.modified(evt.target));
+      // canvas.on('object:scaling',  (evt) => objectHandlers.scaling(evt.target));
+      // canvas.on('selection:cleared', ()  => objectHandlers.cleared()); 

@@ -2,20 +2,24 @@ import * as types from '../constants';
 import {fabric} from 'fabric';
 
 export const initialize = (id, canvas) => (dispatch, getState) => {
-  // canvas.toJSON()    
   dispatch({
       type: types.CANVAS_INITIALIZE, 
       id: id, canvas: JSON.stringify(canvas) });
 };
 
 export const addObject = (id, object) => (dispatch, getState) => {    
-  dispatch({type: types.ADD_OBJECT, id: id, object: JSON.stringify(object)});
-  // dispatch({type: types.OBJECT_SELECTED, payload: object});
+  let canvas_json = getState().views.byId[id].canvas;
+  console.log(getState().views.byId[id]);
+  // rebuild canvas and add object
+  var canvas = new fabric.Canvas();
+  canvas.loadFromJSON(canvas_json);
+  canvas.add(object);
+  canvas.setActiveObject(object); 
+  
+  dispatch({type: types.ADD_OBJECT, id: id, canvas: JSON.stringify(canvas)});
 };
 
 export const modified = event => ({type: types.OBJECT_MODIFIED, payload: event.target});
-
-export const refresh = id => ({type: types.CANVAS_REFRESH, id: id});
 
 
 export const toDataURL = (id) => (dispatch, getState) => {

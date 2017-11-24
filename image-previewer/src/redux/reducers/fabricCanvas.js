@@ -19,6 +19,17 @@ function byId(state = {}, action) {
           }
         }
       }
+     
+    case types.ADD_OBJECT:{
+      let {id, canvas} = action;
+      return {
+        ...state,
+        [id]:{
+          ...state[id],
+          canvas: canvas
+        }
+      }
+    }  
     case types.DELETE_IMAGE:
       {
         // desctructor using Spread Operator
