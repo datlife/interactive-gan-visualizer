@@ -14,8 +14,9 @@ class SingleView extends React.Component {
         * Update canvas view if there is an event triggered
   */
   render() {
-    let {image, views, id, ...props} = this.props;    
+    let {image, bboxes, views, id, ...props} = this.props;    
     let {ImageHandler} = this.props;
+
     return (
       <div className={image.isDebugging? "true" : "container"}> {/* to expand the view */}
 

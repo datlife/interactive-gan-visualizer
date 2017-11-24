@@ -12,8 +12,8 @@ import * as ImageHandler from '../redux/actions/imageHandler';
 function mapStatesToProps(state){
   return {
     images: state.images,
+    bboxes: state.bboxes,
     views:  state.views,
-    
   }
 }
 
@@ -34,7 +34,7 @@ class Content extends React.Component{
        5. other states (debug toggle, etc)
   */
   render(){
-    let {images, ...props} = this.props;
+    let {images,bboxes,...props} = this.props;
     return (   
         <div className="container-fluid"> 
           <ul className="list-group">{
@@ -42,6 +42,7 @@ class Content extends React.Component{
             ? images.allIds.map((id) => {
                   return <SingleView  key={id} id={id} 
                                       image={images.byId[id]} 
+                                      bboxes={bboxes.byId[id]}
                                       {...props} /> }) 
             : null}
           </ul>

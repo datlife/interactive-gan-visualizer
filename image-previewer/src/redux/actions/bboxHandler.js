@@ -6,6 +6,10 @@ export const moving = createAction(types.OBJECT_MOVING);
 export const scaling = createAction(types.OBJECT_SCALING);
 export const cleared = createAction(types.OBJECT_CLEARED);
 
+
+export const drawbox = (evt) =>{
+  return {type: types.DRAW_OBJECT, payload: evt};
+}
 export const modified = obj => {
   const {width, height, scaleX, scaleY} = obj;
   console.log("modifying");

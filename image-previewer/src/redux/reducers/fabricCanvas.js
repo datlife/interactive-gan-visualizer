@@ -19,21 +19,12 @@ function byId(state = {}, action) {
           }
         }
       }
-    case types.ADD_OBJECT:
-      {
-        let {id, object} = action;
-        return {
-          ...state,
-          [id]: {
-            ...state[id],
-            canvas:  {...state[id].canvas, objects: [...state[id].canvas.objects, object]}
-          }
-        };
-      }
     case types.DELETE_IMAGE:
       {
         // desctructor using Spread Operator
-        let {[action.id]: deleted, [`generated-${action.id}`]: any, ...new_state} = state;
+        let {[action.id]: deleted, 
+             [`generated-${action.id}`]: any, 
+             [`debug-${action.id}`]: gone, ...new_state} = state;
         return new_state;
       }
     case types.CANVAS_REFRESH:
@@ -55,7 +46,14 @@ function allIds(state = [], action) {
       ]
     case types.DELETE_IMAGE:
       {
-        return state.filter(id => (id !== (action.id || id !== `generated-${action.id}`)))
+        return state.filter(function(id){
+          if ((id !== action.id) && 
+              (id !== `generated-${action.id}`) &&
+              (id !== `debug-${action.id}`) ){
+            return true;            
+          }
+          return false;
+        });
       }
 
     default:

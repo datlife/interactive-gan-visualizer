@@ -1,16 +1,15 @@
 import * as types from '../constants';
 import {fabric} from 'fabric';
 
-export const initialize = (id, canvas) => (dispatch, getState) => {    
+export const initialize = (id, canvas) => (dispatch, getState) => {
+  // canvas.toJSON()    
   dispatch({
       type: types.CANVAS_INITIALIZE, 
-      id: id, canvas: canvas.toJSON()});
+      id: id, canvas: JSON.stringify(canvas) });
 };
 
-export const addObject = (id, object) => (dispatch, getState) => {  
-  // fabricCanvas.add(object);
-  // fabricCanvas.setActiveObject(object); 
-  dispatch({type: types.ADD_OBJECT, id: id, object: object.toJSON()});
+export const addObject = (id, object) => (dispatch, getState) => {    
+  dispatch({type: types.ADD_OBJECT, id: id, object: JSON.stringify(object)});
   // dispatch({type: types.OBJECT_SELECTED, payload: object});
 };
 
