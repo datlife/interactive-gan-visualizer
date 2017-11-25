@@ -79,10 +79,7 @@ def _main_():
         yolov2 = yolo.model
         yolov2.load_weights(WEIGHTS)
 
-        img_shape = K.placeholder(shape=(2,))
-
-        boxes, classes, scores = yolo.post_process(img_shape=img_shape,
-                                                   n_classes      = N_CLASSES,
+        boxes, classes, scores = yolo.post_process(n_classes      = N_CLASSES,
                                                    iou_threshold  = IOU,
                                                    score_threshold= THRESHOLD)
 
@@ -100,7 +97,6 @@ def _main_():
         pred_bboxes, pred_classes, pred_scores = sess.run([boxes, classes, scores],
                                                           feed_dict={
                                                               yolov2.input: img,
-                                                              img_shape: [height, width],
                                                               K.learning_phase(): 0
                                                           })
         # #################
@@ -108,7 +104,10 @@ def _main_():
         # #################
         bboxes = []
         for box, cls, score in zip(pred_bboxes, pred_classes, pred_scores):
+            # Scale boxes back to original image shape.
+            box = box * np.array([height, width, height, width])
             y1, x1, y2, x2 = box
+
             bboxes.append(DrawingBox(x1, y1, x2, y2, class_names[cls], score))
             print("Found {} with {:2.1f}% on {}".format(class_names[cls], score*100, IMG_PATH.split('/')[-1]))
 

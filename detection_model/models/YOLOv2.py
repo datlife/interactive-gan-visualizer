@@ -30,44 +30,9 @@ model = yolo.model.compile('adam',loss=custom_loss)
 import numpy as np
 import tensorflow as tf
 import keras.backend as K
-
-from darknet19 import conv_block
-
 from keras.models import Model
-from keras.regularizers import l2
-from keras.layers.merge import concatenate
-from keras.layers import Lambda, Conv2D, BatchNormalization, Activation
-
-
-def yolov2_detector(feature_extractor, num_classes, num_anchors, fine_grained_layers):
-    """
-    Original YOLOv2 Implementation
-    :param feature_extractor:
-    :param num_classes:
-    :param num_anchors:
-
-    :return:
-    """
-
-    inputs = feature_extractor.model.output
-    i = feature_extractor.model.get_layer(fine_grained_layers).output
-
-    x = conv_block(inputs, 1024, (3, 3))
-    x = conv_block(x, 1024, (3, 3))
-    x2 = x
-
-    # Reroute
-    x = conv_block(i, 64, (1, 1))
-    x = Lambda(lambda x: tf.space_to_depth(x, block_size=2),
-               lambda shape: [shape[0], shape[1] / 2, shape[2] / 2, 2 * 2 * shape[-1]] if shape[1] else
-               [shape[0], None, None, 2 * 2 * shape[-1]],
-               name='space_to_depth_x2')(x)
-
-    x = concatenate([x, x2])
-    x = conv_block(x, 1024, (3, 3))
-    x = Conv2D(num_anchors * (num_classes + 5), (1, 1), name='yolov2', kernel_regularizer=l2(5e-4))(x)
-
-    return x
+from keras.layers import Lambda
+from detector import yolov2_detector
 
 DETECTOR = {'yolov2': yolov2_detector}
 FINE_GRAINED_LAYERS = {'yolov2': 'leaky_re_lu_13'}
@@ -105,7 +70,7 @@ class YOLOv2(object):
         self.model = Model(inputs=feature_extractor.model.input,
                            outputs=self.detector)
 
-    def post_process(self, img_shape, n_classes=80, iou_threshold=0.5, score_threshold=0.6):
+    def post_process(self, n_classes=80, iou_threshold=0.5, score_threshold=0.6):
         """
         Input: out feature map from network
 
@@ -166,17 +131,10 @@ class YOLOv2(object):
         scores = tf.boolean_mask(box_class_scores, prediction_mask)
         classes = tf.boolean_mask(box_classes, prediction_mask)
 
-        # Scale boxes back to original image shape.
-        height, width = img_shape[0], img_shape[1]
-        image_dims = tf.cast(K.stack([height, width, height, width]), tf.float32)
-        image_dims = K.reshape(image_dims, [1, 4])
-        boxes = boxes * image_dims
-
         nms_index = tf.image.non_max_suppression(boxes, scores, 10, iou_threshold)
-        boxes     = tf.gather(boxes, nms_index)
-        scores    = tf.gather(scores, nms_index)
-        classes   = tf.gather(classes, nms_index)
-
+        boxes = tf.gather(boxes, nms_index)
+        scores = tf.gather(scores, nms_index)
+        classes = tf.gather(classes, nms_index)
         return boxes, classes, scores
 
     def loss_func(self, y_true, y_pred):
@@ -285,13 +243,14 @@ class YOLOv2(object):
         return c_xy
 
 
-def reroute(x1, x2, stride=2):
-    x = conv_block(x1, 64, (1, 1))
-    x = Lambda(lambda x: tf.space_to_depth(x, block_size=stride),
-               lambda shape: [shape[0], shape[1] / stride, shape[2] / stride, stride * stride * shape[-1]] if shape[
-                   1] else
-               [shape[0], None, None, stride * stride * shape[-1]],
-               name='space_to_depth_x2')(x)
-    x = concatenate([x, x2])
+def _non_max_suppresion(boxes, scores, classes, max_boxes, iou_threshold):
+    import tensorflow as tf
+    nms_index = tf.image.non_max_suppression(boxes, scores, max_boxes, iou_threshold)
+    boxes     = tf.gather(boxes, nms_index)
+    scores    = tf.gather(scores, nms_index)
+    classes   = tf.gather(classes, nms_index)
 
-    return x
+    return boxes, scores, classes
+
+def output_shape(shape):
+    return shape[0], shape[1], shape[2]

@@ -3,14 +3,14 @@ Export trained Model in Keras into TF Serving
 """
 from __future__ import print_function
 from keras import backend as K
+K.set_learning_phase(0)
 
 import tensorflow as tf
-from tensorflow.python.saved_model import builder as saved_model_builder
-from tensorflow.python.saved_model import tag_constants, signature_constants
-from tensorflow.python.saved_model.signature_def_utils_impl import build_signature_def, predict_signature_def
+from tensorflow.python.saved_model import signature_constants
 from tensorflow.python.client import session
 from tensorflow.python import pywrap_tensorflow
 from tensorflow.python.framework import graph_util
+from tensorflow.core.protobuf import rewriter_config_pb2
 from tensorflow.python.training import saver as saver_lib
 
 import os
@@ -45,8 +45,7 @@ def _main_():
     THRESHOLD = args.threshold
 
     if not os.path.isfile(WEIGHTS):
-        print("Weight file is invalid")
-        exit()
+        raise IOError("Weight file is invalid")
 
     anchors, class_names = config_prediction()
 
@@ -54,47 +53,37 @@ def _main_():
     # Construct Graph #
     # #################
     darknet = FeatureExtractor(is_training=False, img_size=None, model=FEATURE_EXTRACTOR)
-    yolo = YOLOv2(num_classes      = N_CLASSES,
-                  anchors          = np.array(anchors),
-                  is_training      = False,
-                  feature_extractor= darknet,
-                  detector         = FEATURE_EXTRACTOR)
+    yolo = YOLOv2(num_classes=N_CLASSES,
+                  anchors=np.array(anchors),
+                  is_training=False,
+                  feature_extractor=darknet,
+                  detector=FEATURE_EXTRACTOR)
 
     model = yolo.model
     model.load_weights(WEIGHTS)
-    img_shape = K.placeholder(shape=(2,))
 
-    boxes, classes, scores = yolo.post_process(img_shape=img_shape,
-                                               n_classes=N_CLASSES,
+    # TODO: add lambda func
+    boxes, classes, scores = yolo.post_process(n_classes=N_CLASSES,
                                                iou_threshold=IOU,
                                                score_threshold=THRESHOLD)
 
-    # serialize the model and get its weights, for quick re-building
-    config = model.get_config()
-    weights = model.get_weights()
-
-    # ##########################
-    # Configure output Tensors #
-    # ##########################
     with tf.Session() as sess:
-        from keras.models import model_from_config
 
-        K.set_learning_phase(0)  # all new operations will be in test mode from now on
-
-        # re-build a model where the learning phase is now hard-coded to 0
-        new_model = model_from_config(config)
-        new_model.set_weights(weights)
-
-        # #####################
-        # OPTIMIZE MODELS
-        # #####################
-        postprocessed_tensors = {
-            'detection_boxes': boxes,
-            'detection_scores': scores,
-            'detection_classes': classes,
-        }
-        outputs = _add_output_tensor_nodes(postprocessed_tensors, 'interference_op')
-        output_node_names = ','.join(outputs.keys())
+        from keras.models import Model
+        model = Model(inputs=model.input,
+                      outputs=yolo.post_process(n_classes=N_CLASSES,
+                                                iou_threshold=IOU,
+                                                score_threshold=THRESHOLD))
+        # # ########################
+        # # Configure output Tensors
+        # # #######################
+        # postprocessed_tensors = {
+        #     'detection_boxes': boxes,
+        #     'detection_scores': scores,
+        #     'detection_classes': classes,
+        # }
+        # outputs = _add_output_tensor_nodes(postprocessed_tensors, 'interference_op')
+        # output_node_names = ','.join(outputs.keys())
 
         # #####################
         # Freeze the model
@@ -109,7 +98,6 @@ def _main_():
     # Export to TF Serving#
     # #####################
     export_path = "frozen_graph/1"
-
     with tf.Graph().as_default():
         with session.Session() as sess:
 
@@ -137,7 +125,36 @@ def _main_():
             builder.save()
 
 
-from tensorflow.core.protobuf import rewriter_config_pb2
+def _add_output_tensor_nodes(postprocessed_tensors,
+                             output_collection_name='inference_op'):
+  """Adds output nodes for detection boxes and scores.
+
+  Args:
+    postprocessed_tensors: a dictionary containing the following fields
+      'detection_boxes': [batch, max_detections, 4]
+      'detection_scores': [batch, max_detections]
+      'detection_classes': [batch, max_detections]
+
+    output_collection_name: Name of collection to add output tensors to.
+
+  Returns:
+    A tensor dict containing the added output tensor nodes.
+  """
+  boxes   = postprocessed_tensors.get('detection_boxes')
+  scores  = postprocessed_tensors.get('detection_scores')
+  classes = postprocessed_tensors.get('detection_classes')
+
+  outputs = dict()
+  outputs['detection_boxes']   = tf.identity(boxes, name='detection_boxes')
+  outputs['detection_scores']  = tf.identity(scores, name='detection_scores')
+  outputs['detection_classes'] = tf.identity(classes, name='detection_classes')
+
+  for output_key in outputs:
+    tf.add_to_collection(output_collection_name, outputs[output_key])
+
+  return outputs
+
+
 def freeze_graph_with_def_protos(
     input_graph_def,
     input_saver_def,
@@ -206,35 +223,6 @@ def freeze_graph_with_def_protos(
           variable_names_blacklist=variable_names_blacklist)
 
   return output_graph_def
-
-def _add_output_tensor_nodes(postprocessed_tensors,
-                             output_collection_name='inference_op'):
-  """Adds output nodes for detection boxes and scores.
-
-  Args:
-    postprocessed_tensors: a dictionary containing the following fields
-      'detection_boxes': [batch, max_detections, 4]
-      'detection_scores': [batch, max_detections]
-      'detection_classes': [batch, max_detections]
-
-    output_collection_name: Name of collection to add output tensors to.
-
-  Returns:
-    A tensor dict containing the added output tensor nodes.
-  """
-  boxes   = postprocessed_tensors.get('detection_boxes')
-  scores  = postprocessed_tensors.get('detection_scores')
-  classes = postprocessed_tensors.get('detection_classes')
-
-  outputs = {}
-  outputs['detection_boxes']   = tf.identity(boxes, name='detection_boxes')
-  outputs['detection_scores']  = tf.identity(scores, name='detection_scores')
-  outputs['detection_classes'] = tf.identity(classes, name='detection_classes')
-
-  for output_key in outputs:
-    tf.add_to_collection(output_collection_name, outputs[output_key])
-
-  return outputs
 
 
 def config_prediction():
