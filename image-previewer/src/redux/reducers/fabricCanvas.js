@@ -7,7 +7,7 @@ export default combineReducers({byId: byId, allIds: allIds})
 
 function byId(state = {}, action) {
   switch (action.type) {
-    case types.CANVAS_INITIALIZE:
+    case types.INITIALIZE_CANVAS:
       {
         let {id, canvas} = action;
         return {
@@ -21,6 +21,16 @@ function byId(state = {}, action) {
       }
      
     case types.ADD_OBJECT:{
+      let {id, canvas} = action;
+      return {
+        ...state,
+        [id]:{
+          ...state[id],
+          canvas: canvas
+        }
+      }
+    }  
+    case types.MODIFY_CANVAS:{
       let {id, canvas} = action;
       return {
         ...state,
@@ -50,7 +60,7 @@ function byId(state = {}, action) {
 
 function allIds(state = [], action) {
   switch (action.type) {
-    case types.CANVAS_INITIALIZE:
+    case types.INITIALIZE_CANVAS:
       return [
         ...state,
         action.id

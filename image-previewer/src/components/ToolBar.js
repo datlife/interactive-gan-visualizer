@@ -1,15 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { fabric } from 'fabric';
 
 // Just a bunch of Material UI components
-import CropIcon from 'material-ui/svg-icons/image/crop-free';
-import UndoIcon from 'material-ui/svg-icons/content/undo';
-import RedoIcon from 'material-ui/svg-icons/content/redo';
+import AddIcon from 'material-ui/svg-icons/content/add';
+import DoneIcon from 'material-ui/svg-icons/action/done';
+import ClearIcon from 'material-ui/svg-icons/content/clear';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import {Card, IconButton, GridList, MenuItem, Slider, SelectField,
   Toggle, ToolbarSeparator, RaisedButton} from 'material-ui';
-
 
 // Redux
 import {connect} from 'react-redux';
@@ -38,9 +36,15 @@ class Toolbar extends React.Component {
 
         <div className="p-2">
           <Card className="d-flex flex-column">
-            <IconButton className="mt-0" onClick={this._addBox.bind(this)}>
-                <CropIcon />
+            <IconButton className="mt-0">
+                <DoneIcon />
             </IconButton>
+            <IconButton className="mt-0" onClick={this._addBox.bind(this)}>
+                <AddIcon />
+            </IconButton>
+            {/* <IconButton className="mt-0">
+                <ClearIcon />
+            </IconButton> */}
             <IconButton className="mt-0" onClick={this._save.bind(this)}>
                 <SaveIcon/>
             </IconButton>
