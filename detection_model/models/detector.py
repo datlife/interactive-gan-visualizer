@@ -15,14 +15,14 @@ def yolov2_detector(feature_extractor, num_classes, num_anchors, fine_grained_la
     :return:
     """
     inputs = feature_extractor.model.output
-    i = feature_extractor.model.get_layer(fine_grained_layers).output
+    fine_grained_layer = feature_extractor.model.get_layer(fine_grained_layers).output
 
     x = conv_block(inputs, 1024, (3, 3))
     x = conv_block(x, 1024, (3, 3))
     x2 = x
 
     # Reroute
-    x = conv_block(i, 64, (1, 1))
+    x = conv_block(fine_grained_layer, 64, (1, 1))
     x = Lambda(space_to_depth,
                determine_shape,
                name='space_to_depth_x2')(x)

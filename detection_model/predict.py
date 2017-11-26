@@ -26,11 +26,14 @@ parser.add_argument('-t', '--threshold',
 import numpy as np
 import tensorflow as tf
 import keras.backend as K
-from models.YOLOv2 import YOLOv2
-from models.FeatureExtractor import FeatureExtractor
+# from models.YOLOv2 import YOLOv2
+# from models.FeatureExtractor import FeatureExtractor
 
 from utils.draw_boxes import DrawingBox
 from utils.visualize import draw_bboxes
+
+from models.model import YOLOv2
+from models.darknet19 import yolo_preprocess_input
 
 
 def _main_():
@@ -45,46 +48,40 @@ def _main_():
     THRESHOLD = args.threshold
 
     anchors, class_names = config_prediction()
+    image = cv2.cvtColor(cv2.imread(IMG_PATH), cv2.COLOR_BGR2RGB)
+    height, width, _ = image.shape
 
     with tf.Session() as sess:
+        from keras.models import Model
+        from keras.layers import Lambda, Input
 
         # #################
         # Construct Graph #
         # #################
-        darknet = FeatureExtractor(is_training=False, img_size=IMG_INPUT_SIZE, model=FEATURE_EXTRACTOR)
-        yolo = YOLOv2(
-            is_training=False,
-            num_classes      = N_CLASSES,
-            img_size         = IMG_INPUT_SIZE,
-            anchors          = np.array(anchors),
-            feature_extractor= darknet,
-            detector         = FEATURE_EXTRACTOR)
+        # darknet = FeatureExtractor(is_training=False, img_size=IMG_INPUT_SIZE, model=FEATURE_EXTRACTOR)
+        yolov2 = YOLOv2(anchors, N_CLASSES, yolo_preprocess_input)
 
-        yolov2 = yolo.model
-        yolov2.load_weights(WEIGHTS)
+        inputs         = Input(shape=(None, None, 3))
+        resized_inputs = Lambda(lambda x: tf.image.resize_images(x, (IMG_INPUT_SIZE, IMG_INPUT_SIZE)))(inputs)
 
-        # #####################
-        # Process Image Input #
-        # #####################
-        image = cv2.cvtColor(cv2.imread(IMG_PATH), cv2.COLOR_BGR2RGB)
-        height, width, _ = image.shape
+        prediction             = yolov2.predict(resized_inputs)
+        boxes, classes, scores = yolov2.post_process(prediction,
+                                                     iou_threshold  = IOU,
+                                                     score_threshold= THRESHOLD)
 
-        # #################
-        # Make Prediction #
-        # #################
-        prediction             = yolov2.output
-        boxes, classes, scores = yolo.post_process(prediction,
-                                                   iou_threshold  = IOU,
-                                                   score_threshold= THRESHOLD)
+        model = Model(inputs=inputs, outputs=[boxes, classes, scores])
+        model.load_weights(WEIGHTS)
 
+        model.summary()
         # #################
         # Start a session #
         # #################
         pred_bboxes, pred_classes, pred_scores = sess.run([boxes, classes, scores],
                                                           feed_dict={
                                                               K.learning_phase(): 0,
-                                                              yolov2.input: np.expand_dims(image, axis=0),
+                                                              inputs: np.expand_dims(image, axis=0),
                                                           })
+
         # #################
         # Display Result  #
         # #################
@@ -114,7 +111,7 @@ def config_prediction():
     # Load class names
     with open(CATEGORIES, mode='r') as txt_file:
         class_names = [c.strip() for c in txt_file.readlines()]
-    return anchors, class_names
+    return np.array(anchors), class_names
 
 
 if __name__ == "__main__":

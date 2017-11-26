@@ -10,13 +10,16 @@ In this file, we define three different detector:
 import numpy as np
 import tensorflow as tf
 import keras.backend as K
+
 from keras.layers import Lambda
 from keras.models import Model
-from detector import yolov2_detector
 
+from .detector import yolov2_detector
+from .custom_layers import PostProcessor
+from .utils import interpret_prediction
 
-DETECTOR = {'yolov2': yolov2_detector}
 FINE_GRAINED_LAYERS = {'yolov2': 'leaky_re_lu_13'}
+DETECTOR = {'yolov2': yolov2_detector}
 
 
 class YOLOv2(object):
@@ -61,7 +64,9 @@ class YOLOv2(object):
         Output:
            Bounding Boxes - Classes - Probabilities
         """
-        outputs = PostProcessor(score_threshold, iou_threshold, self._interpret_prediction)(prediction)
+        outputs = PostProcessor(score_threshold, iou_threshold, interpret_prediction,
+                                self.anchors, self.num_classes,
+                                name="non_max_suppression")(prediction)
         boxes   = Lambda(lambda x: x[..., :4], name="boxes")(outputs)
         scores  = Lambda(lambda x: x[..., 4],  name="scores")(outputs)
         classes = Lambda(lambda x: K.cast(x[..., 5], tf.int8),  name="classes")(outputs)
@@ -162,87 +167,3 @@ class YOLOv2(object):
         loss = 0.5 * (loc_loss + obj_conf_loss + category_loss)
 
         return loss
-
-    def _interpret_prediction(self, prediction):
-
-        N_CLASSES = self.num_classes
-        N_ANCHORS = len(self.anchors)
-        ANCHORS = self.anchors
-
-        pred_shape = tf.shape(prediction)
-        GRID_H, GRID_W = pred_shape[1], pred_shape[2]
-
-        prediction = K.reshape(prediction, [-1, pred_shape[1], pred_shape[2], N_ANCHORS, N_CLASSES + 5])
-
-        # Create off set map
-        cx = tf.cast((K.arange(0, stop=GRID_W)), dtype=tf.float32)
-        cx = K.tile(cx, [GRID_H])
-        cx = K.reshape(cx, [-1, GRID_H, GRID_W, 1])
-
-        cy = K.cast((K.arange(0, stop=GRID_H)), dtype=tf.float32)
-        cy = K.reshape(cy, [-1, 1])
-        cy = K.tile(cy, [1, GRID_W])
-        cy = K.reshape(cy, [-1])
-        cy = K.reshape(cy, [-1, GRID_H, GRID_W, 1])
-
-        c_xy = tf.stack([cx, cy], -1)
-        c_xy = tf.to_float(c_xy)
-
-        anchors_tensor = tf.to_float(K.reshape(ANCHORS, [1, 1, 1, N_ANCHORS, 2]))
-        netout_size = tf.to_float(K.reshape([GRID_W, GRID_H], [1, 1, 1, 1, 2]))
-
-        box_xy = K.sigmoid(prediction[..., :2])
-        box_wh = K.exp(prediction[..., 2:4])
-        box_confidence = K.sigmoid(prediction[..., 4:5])
-        box_class_probs = K.softmax(prediction[..., 5:])
-
-        # Shift center points to its grid cell accordingly (Ref: YOLO-9000 loss function)
-        box_xy = (box_xy + c_xy) / netout_size
-        box_wh = (box_wh * anchors_tensor) / netout_size
-
-        return box_xy, box_wh, box_confidence, box_class_probs
-
-
-from keras import layers
-
-
-class PostProcessor(layers.Layer):
-    def __init__(self, score_threshold, iou_threshold, _interpret_prediction, **kwargs):
-        self.score_threshold       = score_threshold
-        self.iou_threshold         = iou_threshold
-        self._interpret_prediction = _interpret_prediction
-        self.result = None
-        super(PostProcessor, self).__init__()
-
-    def build(self, input_shape):
-        super(PostProcessor, self).build(input_shape)
-
-    def call(self, inputs, **kwargs):
-        box_xy, box_wh, box_confidence, box_class_probs = self._interpret_prediction(inputs)
-
-        # Calculate corner points of bounding boxes
-        box_mins  = box_xy - (box_wh / 2.)
-        box_maxes = box_xy + (box_wh / 2.)
-        # Y1, X1, Y2, X2
-        boxes = K.concatenate([box_mins[..., 1:2], box_mins[..., 0:1],     # Y1 X1
-                               box_maxes[..., 1:2], box_maxes[..., 0:1]])  # Y2 X2
-
-        box_scores  = box_confidence * box_class_probs
-        box_classes = K.argmax(box_scores, -1)
-
-        box_class_scores = K.max(box_scores, -1)
-        prediction_mask  = (box_class_scores >= self.score_threshold)
-
-        boxes   = tf.boolean_mask(boxes, prediction_mask)
-        scores  = tf.boolean_mask(box_class_scores, prediction_mask)
-        classes = tf.boolean_mask(box_classes, prediction_mask)
-
-        nms_index = tf.image.non_max_suppression(boxes, scores, 10, self.iou_threshold)
-        boxes   = tf.gather(boxes, nms_index)
-        scores  = K.expand_dims(tf.gather(scores, nms_index), axis=-1)
-        classes = K.expand_dims(tf.gather(classes, nms_index), axis=-1)
-
-        return K.concatenate([boxes, scores, K.cast(classes, tf.float32)])
-
-    def compute_output_shape(self, input_shape):
-        return [(None, 6)]

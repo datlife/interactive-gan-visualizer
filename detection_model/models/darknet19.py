@@ -23,7 +23,6 @@ def darknet19(input_layer, num_classes=1000, include_top=False):
     :param include_top:
     :return:
     """
-
     x = conv_block(input_layer, 32, (3, 3))  # << --- Input layer
     x = MaxPool2D(strides=2)(x)
 
@@ -45,6 +44,7 @@ def darknet19(input_layer, num_classes=1000, include_top=False):
     x = conv_block(x, 512, (3, 3))
     x = conv_block(x, 256, (1, 1))
     x = conv_block(x, 512, (3, 3))
+    fine_grained_layer = x
     x = MaxPool2D(strides=2)(x)
 
     x = conv_block(x, 1024, (3, 3))
@@ -62,7 +62,7 @@ def darknet19(input_layer, num_classes=1000, include_top=False):
         return darknet
 
     feature_map = x
-    return feature_map
+    return feature_map, fine_grained_layer
 
 
 def conv_block(x, filters, kernel_size, name=None):
