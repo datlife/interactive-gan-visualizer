@@ -126,6 +126,7 @@ def _main_():
             builder.add_meta_graph_and_variables(
                     sess, [tf.saved_model.tag_constants.SERVING],
                     signature_def_map={
+                        'predict_images': detection_signature,
                         signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:
                             detection_signature,
                     },
