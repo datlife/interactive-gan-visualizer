@@ -52,38 +52,49 @@ def _main_():
     # #################
     # Construct Graph #
     # #################
-    darknet = FeatureExtractor(is_training=False, img_size=None, model=FEATURE_EXTRACTOR)
-    yolo = YOLOv2(num_classes=N_CLASSES,
-                  anchors=np.array(anchors),
-                  is_training=False,
-                  feature_extractor=darknet,
-                  detector=FEATURE_EXTRACTOR)
+    darknet = FeatureExtractor(is_training=False, img_size=IMG_INPUT_SIZE, model=FEATURE_EXTRACTOR)
+    yolo = YOLOv2(
+        is_training = False,
+        num_classes = N_CLASSES,
+        img_size    = IMG_INPUT_SIZE,
+        anchors     = np.array(anchors),
+        feature_extractor=darknet,
+        detector    = FEATURE_EXTRACTOR)
 
     model = yolo.model
-    model.load_weights(WEIGHTS)
 
-    # TODO: add lambda func
-    boxes, classes, scores = yolo.post_process(n_classes=N_CLASSES,
+    # TODO: add lambda func -- yayy!
+    boxes, classes, scores = yolo.post_process(model.output,
                                                iou_threshold=IOU,
                                                score_threshold=THRESHOLD)
+    from keras.models import Model
+    new_model = Model(inputs=model.input, outputs=[boxes, classes, scores])
+    new_model.load_weights(WEIGHTS)
+
+    new_model.save('test.h5')
+    K.clear_session()
 
     with tf.Session() as sess:
+        K.set_learning_phase(0)
 
-        from keras.models import Model
-        model = Model(inputs=model.input,
-                      outputs=yolo.post_process(n_classes=N_CLASSES,
-                                                iou_threshold=IOU,
-                                                score_threshold=THRESHOLD))
-        # # ########################
-        # # Configure output Tensors
-        # # #######################
-        # postprocessed_tensors = {
-        #     'detection_boxes': boxes,
-        #     'detection_scores': scores,
-        #     'detection_classes': classes,
-        # }
-        # outputs = _add_output_tensor_nodes(postprocessed_tensors, 'interference_op')
-        # output_node_names = ','.join(outputs.keys())
+        from keras.models import load_model
+        from models.FeatureExtractor import Preprocessor
+        from models.YOLOv2 import PostProcessor
+        model = load_model('test.h5', custom_objects={'Preprocessor': Preprocessor,
+                                                      'PostProcessor': PostProcessor})
+
+        model.summary()
+
+        # ########################
+        # Configure output Tensors
+        # #######################
+        postprocessed_tensors = {
+            'detection_boxes': model.output[0],
+            'detection_classes': model.output[1],
+            'detection_scores': model.output[2],
+        }
+        outputs = _add_output_tensor_nodes(postprocessed_tensors, 'interference_op')
+        output_node_names = ','.join(outputs.keys())
 
         # #####################
         # Freeze the model
@@ -94,35 +105,35 @@ def _main_():
                                                                      sess.graph.as_default(),
                                                                      output_node_names)
 
-    # #####################
-    # Export to TF Serving#
-    # #####################
-    export_path = "frozen_graph/1"
-    with tf.Graph().as_default():
-        with session.Session() as sess:
-
-            tf.import_graph_def(frozen_graph_def, name='')
-            builder = tf.saved_model.builder.SavedModelBuilder(export_path)
-            a = tf.get_default_graph().as_graph_def().node
-            # print(a)
-            tensor_info_inputs = {'inputs': tf.saved_model.utils.build_tensor_info(a)}
-            tensor_info_outputs = {}
-            for k, v in outputs.items():
-                tensor_info_outputs[k] = tf.saved_model.utils.build_tensor_info(v)
-
-            detection_signature = (
-                tf.saved_model.signature_def_utils.build_signature_def(
-                    inputs=tensor_info_inputs,
-                    outputs=tensor_info_outputs,
-                    method_name=signature_constants.PREDICT_METHOD_NAME))
-
-            builder.add_meta_graph_and_variables(sess,
-                                                 [tf.saved_model.tag_constants.SERVING],
-                                                 signature_def_map={
-                                                     signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:
-                                                         detection_signature,
-                                                 })
-            builder.save()
+    # # #####################
+    # # Export to TF Serving#
+    # # #####################
+    # export_path = "frozen_graph/1"
+    # with tf.Graph().as_default():
+    #     with session.Session() as sess:
+    #
+    #         tf.import_graph_def(frozen_graph_def, name='')
+    #         builder = tf.saved_model.builder.SavedModelBuilder(export_path)
+    #         a = tf.get_default_graph().as_graph_def().node
+    #         # print(a)
+    #         tensor_info_inputs = {'inputs': tf.saved_model.utils.build_tensor_info(a)}
+    #         tensor_info_outputs = {}
+    #         for k, v in outputs.items():
+    #             tensor_info_outputs[k] = tf.saved_model.utils.build_tensor_info(v)
+    #
+    #         detection_signature = (
+    #             tf.saved_model.signature_def_utils.build_signature_def(
+    #                 inputs=tensor_info_inputs,
+    #                 outputs=tensor_info_outputs,
+    #                 method_name=signature_constants.PREDICT_METHOD_NAME))
+    #
+    #         builder.add_meta_graph_and_variables(sess,
+    #                                              [tf.saved_model.tag_constants.SERVING],
+    #                                              signature_def_map={
+    #                                                  signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:
+    #                                                      detection_signature,
+    #                                              })
+    #         builder.save()
 
 
 def _add_output_tensor_nodes(postprocessed_tensors,

@@ -1,14 +1,12 @@
 """
 DarKNet 19 Architecture
 """
-import time
 from keras.layers import Input
 from keras.layers import Conv2D
 from keras.layers import MaxPool2D
 from keras.layers import BatchNormalization, Activation
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers import GlobalAvgPool2D
-from keras.regularizers import l2
 from keras.models import Model
 
 
@@ -17,21 +15,16 @@ def yolo_preprocess_input(x):
     return x
 
 
-def darknet19(input_size=None, num_classes=1000, include_top=True):
+def darknet19(input_layer, num_classes=1000, include_top=False):
     """
     DarkNet-19 Architecture Definition
-    :param input_size:
+    :param input_layer:
     :param num_classes:
-    :param pretrained_weights:
     :param include_top:
     :return:
     """
-    if input_size is None:
-        image = Input(shape=(None, None, 3))
-    else:
-        image = Input(shape=input_size)
 
-    x = conv_block(image, 32, (3, 3))  # << --- Input layer
+    x = conv_block(input_layer, 32, (3, 3))  # << --- Input layer
     x = MaxPool2D(strides=2)(x)
 
     x = conv_block(x, 64, (3, 3))
@@ -65,9 +58,11 @@ def darknet19(input_size=None, num_classes=1000, include_top=True):
         x = GlobalAvgPool2D()(x)
         x = Activation(activation='softmax')(x)
 
-    darknet = Model(image, x)
+        darknet = Model(input_layer, x)
+        return darknet
 
-    return darknet
+    feature_map = x
+    return feature_map
 
 
 def conv_block(x, filters, kernel_size, name=None):

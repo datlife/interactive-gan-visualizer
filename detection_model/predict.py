@@ -30,7 +30,6 @@ from models.YOLOv2 import YOLOv2
 from models.FeatureExtractor import FeatureExtractor
 
 from utils.draw_boxes import DrawingBox
-from utils.preprocess_img import preprocess_img
 from utils.visualize import draw_bboxes
 
 
@@ -45,59 +44,46 @@ def _main_():
     IOU       = args.iou
     THRESHOLD = args.threshold
 
-    # Config Anchors
-    anchors = []
-    with open(ANCHORS, 'r') as f:
-      data = f.read().splitlines()
-      for line in data:
-        numbers = re.findall('\d+.\d+', line)
-        anchors.append((float(numbers[0]), float(numbers[1])))
-
-    if not os.path.isfile(IMG_PATH):
-        print("Image path is invalid.")
-        exit()
-    if not os.path.isfile(WEIGHTS):
-        print("Weight file is invalid")
-        exit()
-
-    # Load class names
-    with open(CATEGORIES, mode='r') as txt_file:
-        class_names = [c.strip() for c in txt_file.readlines()]
+    anchors, class_names = config_prediction()
 
     with tf.Session() as sess:
 
         # #################
         # Construct Graph #
         # #################
-        darknet = FeatureExtractor(is_training=False, img_size=None, model=FEATURE_EXTRACTOR)
-        yolo = YOLOv2(num_classes      = N_CLASSES,
-                      anchors          = np.array(anchors),
-                      is_training      = False,
-                      feature_extractor=darknet,
-                      detector         = FEATURE_EXTRACTOR)
+        darknet = FeatureExtractor(is_training=False, img_size=IMG_INPUT_SIZE, model=FEATURE_EXTRACTOR)
+        yolo = YOLOv2(
+            is_training=False,
+            num_classes      = N_CLASSES,
+            img_size         = IMG_INPUT_SIZE,
+            anchors          = np.array(anchors),
+            feature_extractor= darknet,
+            detector         = FEATURE_EXTRACTOR)
 
         yolov2 = yolo.model
         yolov2.load_weights(WEIGHTS)
 
-        boxes, classes, scores = yolo.post_process(n_classes      = N_CLASSES,
-                                                   iou_threshold  = IOU,
-                                                   score_threshold= THRESHOLD)
-
         # #####################
         # Process Image Input #
         # #####################
-        orig_img = cv2.cvtColor(cv2.imread(IMG_PATH), cv2.COLOR_BGR2RGB)
-        height, width, _ = orig_img.shape
-        img = preprocess_img(cv2.resize(orig_img, (IMG_INPUT_SIZE, IMG_INPUT_SIZE)))
-        img = np.expand_dims(img, 0)
+        image = cv2.cvtColor(cv2.imread(IMG_PATH), cv2.COLOR_BGR2RGB)
+        height, width, _ = image.shape
 
         # #################
         # Make Prediction #
         # #################
+        prediction             = yolov2.output
+        boxes, classes, scores = yolo.post_process(prediction,
+                                                   iou_threshold  = IOU,
+                                                   score_threshold= THRESHOLD)
+
+        # #################
+        # Start a session #
+        # #################
         pred_bboxes, pred_classes, pred_scores = sess.run([boxes, classes, scores],
                                                           feed_dict={
-                                                              yolov2.input: img,
-                                                              K.learning_phase(): 0
+                                                              K.learning_phase(): 0,
+                                                              yolov2.input: np.expand_dims(image, axis=0),
                                                           })
         # #################
         # Display Result  #
@@ -113,8 +99,22 @@ def _main_():
 
         # Save image to evaluation dir
         if OUTPUT is not None:
-            result = draw_bboxes(orig_img, bboxes)
+            result = draw_bboxes(image, bboxes)
             result.save(os.path.join(OUTPUT, IMG_PATH.split('/')[-1].split('.')[0] + '_result.jpg'))
+
+
+def config_prediction():
+    # Config Anchors
+    anchors = []
+    with open(ANCHORS, 'r') as f:
+        data = f.read().splitlines()
+        for line in data:
+            numbers = re.findall('\d+.\d+', line)
+            anchors.append((float(numbers[0]), float(numbers[1])))
+    # Load class names
+    with open(CATEGORIES, mode='r') as txt_file:
+        class_names = [c.strip() for c in txt_file.readlines()]
+    return anchors, class_names
 
 
 if __name__ == "__main__":
