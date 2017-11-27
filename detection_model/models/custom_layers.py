@@ -119,7 +119,7 @@ class PostProcessor(Layer):
         scores  = tf.boolean_mask(box_class_scores, prediction_mask)
         classes = tf.boolean_mask(box_classes, prediction_mask)
 
-        nms_index = tf.image.non_max_suppression(boxes, scores, 10, self.iou_threshold)
+        nms_index = tf.image.non_max_suppression(boxes, scores, 100, self.iou_threshold)
         boxes   = tf.gather(boxes, nms_index)
         scores  = K.expand_dims(tf.gather(scores, nms_index), axis=-1)
         classes = K.expand_dims(tf.gather(classes, nms_index), axis=-1)

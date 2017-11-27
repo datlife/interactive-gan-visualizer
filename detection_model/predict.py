@@ -7,21 +7,21 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 
-from utils.draw_boxes import DrawingBox
-from utils.visualize import draw_bboxes
 
-from models.YOLOv2 import YOLOv2
-from models.preprocess import yolov2_preprocess_func
+from models.YOLOv2 import YOLOv2, yolov2_preprocess_func
+from models.custom_layers import ImageResizer
+from webcam_demo import draw
+from utils.map_idx_to_label import map_idx_to_labels
 
 from cfg import ANCHORS, IMG_INPUT_SIZE, N_CLASSES, CATEGORIES
 
 parser = argparse.ArgumentParser("Over-fit model to validate loss function")
 
 parser.add_argument('-p', '--path',
-                    help="Path to image file", type=str, default='example.jpg')
+                    help="Path to image file", type=str, default='./assets/example.jpg')
 
 parser.add_argument('-w', '--weights',
-                    help="Path to pre-trained weight files", type=str, default='coco_yolov2.weights')
+                    help="Path to pre-trained weight files", type=str, default='./assets/coco_yolov2.weights')
 
 parser.add_argument('-o', '--output-path',
                     help="Save image to output directory", type=str, default=None)
@@ -51,20 +51,18 @@ def _main_():
 
     with tf.Session() as sess:
         from keras.models import Model
-        from keras.layers import Lambda, Input
+        from keras.layers import Input
 
         # #################
         # Construct Graph #
         # #################
         yolov2 = YOLOv2(anchors, N_CLASSES, yolov2_preprocess_func)
 
-        inputs         = Input(shape=(None, None, 3))
-        resized_inputs = Lambda(lambda x: tf.image.resize_images(x, (IMG_INPUT_SIZE, IMG_INPUT_SIZE)))(inputs)
+        inputs                 = Input(shape=(None, None, 3), name='image_input', dtype=tf.uint8)
+        resized_inputs         = ImageResizer(IMG_INPUT_SIZE, name="ImageResizer")(inputs)
 
         prediction             = yolov2.predict(resized_inputs)
-        boxes, classes, scores = yolov2.post_process(prediction,
-                                                     iou_threshold  = IOU,
-                                                     score_threshold= THRESHOLD)
+        boxes, classes, scores = yolov2.post_process(prediction, iou_threshold=IOU, score_threshold=THRESHOLD)
 
         model = Model(inputs=inputs, outputs=[boxes, classes, scores])
         model.load_weights(WEIGHTS)
@@ -83,24 +81,15 @@ def _main_():
         # #################
         # Display Result  #
         # #################
-        bboxes = []
-        for box, cls, score in zip(pred_bboxes, pred_classes, pred_scores):
-            # Scale boxes back to original image shape.
-            cls = int(cls)
-            box = box * np.array([height, width, height, width])
-            y1, x1, y2, x2 = box
+        label_dict = map_idx_to_labels(CATEGORIES)
 
-            bboxes.append(DrawingBox(x1, y1, x2, y2, class_names[cls], score))
-            print("Found {} with {:2.1f}% on {}".format(class_names[cls], score*100, IMG_PATH.split('/')[-1]))
-
-        # Save image to evaluation dir
+        h, w, _ =  image.shape
         if OUTPUT is not None:
-            result = draw_bboxes(image, bboxes)
-            result.save(os.path.join(OUTPUT, IMG_PATH.split('/')[-1].split('.')[0] + '_result.jpg'))
+            result = draw(image, (w, h),label_dict, pred_bboxes, pred_classes, pred_scores)
+            cv2.imwrite(os.path.join(OUTPUT, IMG_PATH.split('/')[-1].split('.')[0] + '_result.jpg'), result)
 
 
 def config_prediction():
-
     # Config Anchors
     anchors = []
     with open(ANCHORS, 'r') as f:

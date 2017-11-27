@@ -13,8 +13,7 @@ K.set_learning_phase(0)
 from keras.models import Model
 from keras.layers import Input
 
-from models.YOLOv2 import YOLOv2
-from models.preprocess import yolov2_preprocess_func
+from models.YOLOv2 import YOLOv2, yolov2_preprocess_func
 from models.custom_layers import ImageResizer
 from cfg import *
 
@@ -26,6 +25,19 @@ from tensorflow.tools.graph_transforms import TransformGraph
 
 
 import argparse
+
+parser = argparse.ArgumentParser("Export Keras Model to TensorFlow Serving")
+
+parser.add_argument('-o', '--output', help="Export path", type=str, default='/tmp/yolov2')
+
+parser.add_argument('-v', '--version', help="Model Version", type=str, default='1')
+
+parser.add_argument('-w', '--weights',
+                    help="Path to pre-trained weight files", type=str, default='./assets/coco_yolov2.weights')
+
+parser.add_argument('-i', '--iou', help="IoU value for Non-max suppression", type=float, default=0.5)
+
+parser.add_argument('-t', '--threshold', help="Threshold value to display box", type=float, default=0.0)
 
 
 def _main_():
@@ -54,7 +66,7 @@ def _main_():
         # #################
         yolov2 = YOLOv2(anchors, N_CLASSES, yolov2_preprocess_func)
 
-        inputs                 = Input(shape=(None, None, 3), name='image_input')
+        inputs                 = Input(shape=(None, None, 3), name='image_input', dtype=tf.uint8)
         resized_inputs         = ImageResizer(IMG_INPUT_SIZE, name="ImageResizer")(inputs)
 
         prediction             = yolov2.predict(resized_inputs)
@@ -86,10 +98,6 @@ def _main_():
                                      sess.graph.as_graph_def(),
                                      output_node_names.split(','))
 
-        # f = 'only_the_graph_def.pb.ascii'
-        # tf.train.write_graph(sess.graph.as_graph_def(), './', f, as_text=True)
-        # graph_io.write_graph(frozen_graph_def, './', 'frozen_graph.pb', as_text=False)
-
         transforms = ["add_default_attributes",
                       "quantize_weights", "round_weights",
                       "fold_batch_norms", "fold_old_batch_norms"]
@@ -98,6 +106,7 @@ def _main_():
                                          inputs="image_input",
                                          outputs=output_node_names.split(','),
                                          transforms=transforms)
+
         graph_io.write_graph(quantized_graph, './', 'frozen_graph.pb', as_text=False)
 
     # #####################
@@ -191,21 +200,5 @@ def config_prediction():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Export Keras Model to TensorFlow Serving")
-
-    parser.add_argument('-o', '--output',
-                        help="Export path", type=str, default='/tmp/yolov2')
-
-    parser.add_argument('-v', '--version',
-                        help="Model Version", type=str, default='1')
-
-    parser.add_argument('-w', '--weights',
-                        help="Path to pre-trained weight files", type=str, default='coco_yolov2.weights')
-
-    parser.add_argument('-i', '--iou',
-                        help="IoU value for Non-max suppression", type=float, default=0.5)
-
-    parser.add_argument('-t', '--threshold',
-                        help="Threshold value to display box", type=float, default=0.6)
 
     _main_()
