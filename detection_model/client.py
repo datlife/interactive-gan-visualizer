@@ -31,10 +31,14 @@ def main(_):
 
     # Send request
     request = predict_pb2.PredictRequest()
-    image = Image.open(FLAGS.image)
+    try:
+        image = Image.open(FLAGS.image)
+    except Exception as e:
+        print(e)
+        print("Cannot load image")
     image_np = load_image_into_numpy_array(image)
     image_np_expanded = np.expand_dims(image_np, axis=0)
-    # Call GAN model to make prediction on the image
+
     request.model_spec.name = 'yolov2'
     request.model_spec.signature_name = 'predict_images'
     request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto(image_np_expanded))
