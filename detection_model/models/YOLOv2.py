@@ -1,4 +1,7 @@
-"""YOLOv2 Model Definition"""
+"""
+YOLOv2 Model Definition
+"""
+
 import tensorflow as tf
 import keras.backend as K
 
@@ -7,9 +10,12 @@ from keras.layers import MaxPool2D
 from keras.layers import BatchNormalization
 from keras.layers import Lambda, concatenate
 from keras.layers.advanced_activations import LeakyReLU
-from keras.regularizers import l2
-
 from .custom_layers import Preprocessor, PostProcessor, Reroute
+
+
+def yolov2_preprocess_func(inputs):
+    inputs = inputs / 255.
+    return inputs
 
 
 class YOLOv2(object):
@@ -76,13 +82,9 @@ class YOLOv2(object):
 
         return prediction
 
-    def post_process(self, prediction, iou_threshold=0.5, score_threshold=0.6):
+    def post_process(self, prediction, iou_threshold=0.6, score_threshold=0.6):
         """
         Preform non-max suppression to calculate outputs:
-            * Bounding Boxes
-            * Classes
-            * Scores (Probabilities)
-
         Using during evaluation/interference
 
         Args:
@@ -91,8 +93,11 @@ class YOLOv2(object):
         Output:
            Bounding Boxes - Classes - Probabilities
         """
-        outputs = PostProcessor(score_threshold, iou_threshold, interpret_prediction,
-                                self.anchors, self.num_classes,
+        outputs = PostProcessor(score_threshold,
+                                iou_threshold,
+                                interpret_prediction,
+                                self.anchors,
+                                self.num_classes,
                                 name="non_max_suppression")(prediction)
         boxes   = Lambda(lambda x: x[..., :4], name="boxes")(outputs)
         scores  = Lambda(lambda x: x[..., 4],  name="scores")(outputs)
