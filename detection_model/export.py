@@ -2,46 +2,30 @@
 Export trained Model in Keras into TF Serving
 """
 from __future__ import print_function
+
+import os
+import re
+import tensorflow as tf
+
 from keras import backend as K
 K.set_learning_phase(0)
 
-import tensorflow as tf
+from keras.models import Model
+from keras.layers import Input
+
+from models.YOLOv2 import YOLOv2
+from models.preprocess import yolov2_preprocess_func
+from models.custom_layers import ImageResizer
+from cfg import *
+
 from tensorflow.python.saved_model import signature_constants
 from tensorflow.python.client import session
 from tensorflow.python.framework import graph_util
 from tensorflow.core.protobuf import rewriter_config_pb2
-from tensorflow.python import pywrap_tensorflow
-from tensorflow.python.training import saver as saver_lib
+from tensorflow.tools.graph_transforms import TransformGraph
 
-import os
-import re
-
-from keras.models import Model
-from keras.layers import Lambda, Input
-from models.darknet19 import yolo_preprocess_input
-from models.model import YOLOv2
-
-# from models.YOLOv2 import YOLOv2
-# from models.FeatureExtractor import FeatureExtractor
-from cfg import *
 
 import argparse
-parser = argparse.ArgumentParser("Export Keras Model to TensorFlow Serving")
-
-parser.add_argument('-w', '--weights',
-                    help="Path to pre-trained weight files", type=str, default='coco_yolov2.weights')
-
-parser.add_argument('-i', '--iou',
-                    help="IoU value for Non-max suppression", type=float, default=0.5)
-
-parser.add_argument('-t', '--threshold',
-                    help="Threshold value to display box", type=float, default=0.6)
-
-parser.add_argument('-o', '--output',
-                    help="Output", type=str, default='/tmp/yolov2')
-
-parser.add_argument('-v', '--version',
-                    help="Output", type=str, default='1')
 
 
 def _main_():
@@ -59,14 +43,21 @@ def _main_():
 
     anchors, class_names = config_prediction()
 
-    # #################
-    # Construct Graph #
-    # #################
+    # Interference Pipeline for object detection Model
+
+    # Inputs--->Resized---> Preprocessor--->Feature Extractor--> Object Detector---> Prediction ---> PostProcessor
+
     with K.get_session() as sess:
-        yolov2 = YOLOv2(anchors, N_CLASSES, yolo_preprocess_input)
-        inputs         = Input(shape=(None, None, 3))
-        resized_inputs = Lambda(lambda x: tf.image.resize_images(x, (IMG_INPUT_SIZE, IMG_INPUT_SIZE)))(inputs)
-        prediction     = yolov2.predict(resized_inputs)
+
+        # #################
+        # Construct Graph #
+        # #################
+        yolov2 = YOLOv2(anchors, N_CLASSES, yolov2_preprocess_func)
+
+        inputs                 = Input(shape=(None, None, 3), name='image_input')
+        resized_inputs         = ImageResizer(IMG_INPUT_SIZE, name="ImageResizer")(inputs)
+
+        prediction             = yolov2.predict(resized_inputs)
         boxes, classes, scores = yolov2.post_process(prediction, iou_threshold=IOU, score_threshold=THRESHOLD)
 
         model = Model(inputs=inputs, outputs=[boxes, classes, scores])
@@ -78,27 +69,44 @@ def _main_():
         # #######################
 
         postprocessed_tensors = {
-            'detection_boxes': model.output[0],
+            'detection_boxes':   model.output[0],
             'detection_classes': model.output[1],
-            'detection_scores': model.output[2],
+            'detection_scores':  model.output[2],
         }
         outputs = _add_output_tensor_nodes(postprocessed_tensors, 'interference_op')
         output_node_names = ','.join(outputs.keys())
 
-        # #####################
-        # Freeze the model
-        # #####################
+        # ###############################
+        # Freeze the model into pb format
+        # ###############################
+        from tensorflow.python.framework import graph_io
+
         frozen_graph_def = graph_util.convert_variables_to_constants(
                                      sess,
                                      sess.graph.as_graph_def(),
                                      output_node_names.split(','))
 
+        # f = 'only_the_graph_def.pb.ascii'
+        # tf.train.write_graph(sess.graph.as_graph_def(), './', f, as_text=True)
+        # graph_io.write_graph(frozen_graph_def, './', 'frozen_graph.pb', as_text=False)
+
+        transforms = ["add_default_attributes",
+                      "quantize_weights", "round_weights",
+                      "fold_batch_norms", "fold_old_batch_norms"]
+
+        quantized_graph = TransformGraph(frozen_graph_def,
+                                         inputs="image_input",
+                                         outputs=output_node_names.split(','),
+                                         transforms=transforms)
+        graph_io.write_graph(quantized_graph, './', 'frozen_graph.pb', as_text=False)
+
     # #####################
     # Export to TF Serving#
     # #####################
     export_path = os.path.join(EXPORT_PATH, VERSION)
+
     with tf.Graph().as_default():
-        tf.import_graph_def(frozen_graph_def, name='')
+        tf.import_graph_def(quantized_graph, name='')
 
         # Optimizing graph
         rewrite_options = rewriter_config_pb2.RewriterConfig(optimize_tensor_layout=True)
@@ -109,6 +117,7 @@ def _main_():
 
         config = tf.ConfigProto(graph_options=graph_options)
         with session.Session(config=config) as sess:
+
             builder = tf.saved_model.builder.SavedModelBuilder(export_path)
 
             tensor_info_inputs = {
@@ -136,7 +145,10 @@ def _main_():
 
 def _add_output_tensor_nodes(postprocessed_tensors,
                              output_collection_name='inference_op'):
-  """Adds output nodes for detection boxes and scores.
+  """
+  Reference: https://github.com/tensorflow/models/tree/master/research/object_detection
+
+  Adds output nodes for detection boxes and scores.
 
   Args:
     postprocessed_tensors: a dictionary containing the following fields
@@ -179,4 +191,21 @@ def config_prediction():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Export Keras Model to TensorFlow Serving")
+
+    parser.add_argument('-o', '--output',
+                        help="Export path", type=str, default='/tmp/yolov2')
+
+    parser.add_argument('-v', '--version',
+                        help="Model Version", type=str, default='1')
+
+    parser.add_argument('-w', '--weights',
+                        help="Path to pre-trained weight files", type=str, default='coco_yolov2.weights')
+
+    parser.add_argument('-i', '--iou',
+                        help="IoU value for Non-max suppression", type=float, default=0.5)
+
+    parser.add_argument('-t', '--threshold',
+                        help="Threshold value to display box", type=float, default=0.6)
+
     _main_()
