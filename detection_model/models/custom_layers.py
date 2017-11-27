@@ -3,22 +3,19 @@ import keras.backend as K
 from keras.engine.topology import Layer
 
 
-class Preprocessor(Layer):
+class ImageResizer(Layer):
     """
     Pre-process image before loading into feature extractor
     """
-    def __init__(self, img_size, pre_process_func, **kwargs):
-        self.img_size        = img_size
-        self.pre_process_func = pre_process_func
-        super(Preprocessor, self).__init__(**kwargs)
+    def __init__(self, img_size, **kwargs):
+        self.img_size = img_size
+        super(ImageResizer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        super(Preprocessor, self).build(input_shape)
+        super(ImageResizer, self).build(input_shape)
 
     def call(self, inputs, **kwargs):
-        x = tf.image.resize_images(inputs, size=(self.img_size, self.img_size))
-        x = self.pre_process_func(x)
-
+        x = tf.image.resize_images(inputs, (self.img_size, self.img_size))
         return x
 
     def compute_output_shape(self, input_shape):
@@ -28,10 +25,59 @@ class Preprocessor(Layer):
         return tuple(input_shape)
 
     def get_config(self):
-        config = {'img_size': self.img_size,
-                  'pre_process_func': self.pre_process_func}
+        config = {'img_size': self.img_size}
+        base_config = super(ImageResizer, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+class Preprocessor(Layer):
+    """
+    Pre-process image before loading into feature extractor
+    """
+    def __init__(self, pre_process_func, **kwargs):
+        self.pre_process_func = pre_process_func
+        super(Preprocessor, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        super(Preprocessor, self).build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        x = self.pre_process_func(inputs)
+        return x
+
+    def compute_output_shape(self, input_shape):
+        return tuple(input_shape)
+
+    def get_config(self):
+        config = {'pre_process_func': self.pre_process_func}
 
         base_config = super(Preprocessor, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+class Reroute(Layer):
+    """
+    """
+    def __init__(self, block_size=2,  **kwargs):
+        self.block_size        = block_size
+        super(Reroute, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        super(Reroute, self).build(input_shape)
+
+    def call(self, inputs, **kwargs):
+        return tf.space_to_depth(inputs, self.block_size)
+
+    def compute_output_shape(self, shape):
+        block_size = self.block_size
+        if shape[1]:
+            return tuple([shape[0], shape[1] / block_size, shape[2] / 2, block_size * block_size * shape[-1]])
+        else:
+            return tuple([shape[0], None, None, block_size * block_size * shape[-1]])
+
+    def get_config(self):
+        config = {'block_size':self.block_size}
+        base_config = super(Reroute, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 

@@ -3,7 +3,17 @@ import os
 import re
 import cv2
 
-from cfg import ANCHORS, IMG_INPUT_SIZE, FEATURE_EXTRACTOR, N_CLASSES, CATEGORIES
+import numpy as np
+import tensorflow as tf
+import keras.backend as K
+
+from utils.draw_boxes import DrawingBox
+from utils.visualize import draw_bboxes
+
+from models.YOLOv2 import YOLOv2
+from models.preprocess import yolov2_preprocess_func
+
+from cfg import ANCHORS, IMG_INPUT_SIZE, N_CLASSES, CATEGORIES
 
 parser = argparse.ArgumentParser("Over-fit model to validate loss function")
 
@@ -23,20 +33,8 @@ parser.add_argument('-t', '--threshold',
                     help="Threshold value to display box", type=float, default=0.6)
 
 
-import numpy as np
-import tensorflow as tf
-import keras.backend as K
-# from models.YOLOv2 import YOLOv2
-# from models.FeatureExtractor import FeatureExtractor
-
-from utils.draw_boxes import DrawingBox
-from utils.visualize import draw_bboxes
-
-from models.model import YOLOv2
-from models.darknet19 import yolo_preprocess_input
-
-
 def _main_():
+
     # ###############
     # Parse Config  #
     # ###############
@@ -58,8 +56,7 @@ def _main_():
         # #################
         # Construct Graph #
         # #################
-        # darknet = FeatureExtractor(is_training=False, img_size=IMG_INPUT_SIZE, model=FEATURE_EXTRACTOR)
-        yolov2 = YOLOv2(anchors, N_CLASSES, yolo_preprocess_input)
+        yolov2 = YOLOv2(anchors, N_CLASSES, yolov2_preprocess_func)
 
         inputs         = Input(shape=(None, None, 3))
         resized_inputs = Lambda(lambda x: tf.image.resize_images(x, (IMG_INPUT_SIZE, IMG_INPUT_SIZE)))(inputs)
@@ -73,9 +70,10 @@ def _main_():
         model.load_weights(WEIGHTS)
 
         model.summary()
-        # #################
-        # Start a session #
-        # #################
+
+        # ######################################
+        # Run a session to make one prediction #
+        # ######################################
         pred_bboxes, pred_classes, pred_scores = sess.run([boxes, classes, scores],
                                                           feed_dict={
                                                               K.learning_phase(): 0,
@@ -88,6 +86,7 @@ def _main_():
         bboxes = []
         for box, cls, score in zip(pred_bboxes, pred_classes, pred_scores):
             # Scale boxes back to original image shape.
+            cls = int(cls)
             box = box * np.array([height, width, height, width])
             y1, x1, y2, x2 = box
 
@@ -101,6 +100,7 @@ def _main_():
 
 
 def config_prediction():
+
     # Config Anchors
     anchors = []
     with open(ANCHORS, 'r') as f:
@@ -108,6 +108,7 @@ def config_prediction():
         for line in data:
             numbers = re.findall('\d+.\d+', line)
             anchors.append((float(numbers[0]), float(numbers[1])))
+
     # Load class names
     with open(CATEGORIES, mode='r') as txt_file:
         class_names = [c.strip() for c in txt_file.readlines()]
