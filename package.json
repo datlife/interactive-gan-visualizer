@@ -25,6 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.17.1",
+    "b64-to-blob": "^1.2.19",
     "bootstrap": "^4.0.0-alpha.6",
     "dot-prop-immutable": "^1.4.0",
     "fabric": "^1.7.20",
