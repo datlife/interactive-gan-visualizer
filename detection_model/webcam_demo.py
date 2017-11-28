@@ -3,21 +3,14 @@ import time
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from threading import Thread
 from multiprocessing import Queue, Pool
 
 from utils.webcam import WebcamVideoStream, FPS
-from utils.map_idx_to_label import map_idx_to_labels, map_idx
 from client import ObjectDetectionServer
-from cfg import CATEGORIES
 
 detection_model = 'ssd'
 detector = ObjectDetectionServer(server='localhost:9000', detection_model=detection_model)
 
-if detection_model is 'yolov2':
-    label_dict = map_idx_to_labels(CATEGORIES)
-else:
-    label_dict = map_idx('./assets/coco_ssd.txt')
 
 def _main_():
 
@@ -33,7 +26,7 @@ def _main_():
 
     while True:
         frame = video_capture.read()
-        frame = cv2.resize(frame, (300, 300)) 
+        frame = cv2.resize(frame, (width, height))
         input_q.put(frame)
         
         frame = output_q.get()
@@ -57,22 +50,21 @@ def worker(input_q, output_q):
         output_q.put(detect_objects_in(frame))
     fps.stop()
 
-import time
+
 def detect_objects_in(frame):
     global detector
-    global label_dict
-    
+
     predict = time.time()
     data = detector.predict(frame)
 
     # boxes, classes, scores = filter_out(threshold=0.5, data=data)
     boxes, classes, scores = data
-    classes = [label_dict[int(c)] for c in classes]
-    
+
     drawing = time.time()
     frame = draw(frame, boxes, classes, scores)
     print("Prediction in {} || Drawing in {}".format(time.time()-predict, time.time()-drawing))
     return frame
+
 
 def draw(img, bboxes, classes, scores):
     """
@@ -119,7 +111,7 @@ def filter_out(threshold, data):
     new_boxes =[]
     new_classes = []
     new_scores =[]
-    for b,c,s in zip(boxes, classes, scores):
+    for b, c, s in zip(boxes, classes, scores):
         if s > threshold:
             new_boxes.append(b)
             new_classes.append(c)
