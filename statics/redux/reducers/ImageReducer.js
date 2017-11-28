@@ -18,8 +18,10 @@ function byId(state = {}, action) {
             [img_id]: {
               ...state[img_id],
               id: img_id,
+              file: image,
               original: image.preview,
               generated: image.preview,
+              debug: null,
               isDebugging: false
             }
           };
@@ -36,6 +38,7 @@ function byId(state = {}, action) {
         ...state,
         [action.id]: {
           ...state[action.id],
+          debug: action.mask,
           isDebugging: action.debug
         }
       }

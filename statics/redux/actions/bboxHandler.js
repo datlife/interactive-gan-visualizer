@@ -11,7 +11,6 @@ export const scaling =(canvas, id, event) => (dispatch, getState) => {
   let obj = event.target;
 
   const {width, height, scaleX, scaleY, strokeWidth} = obj;
-  console.log(strokeWidth);
   obj
     .setWidth(width * scaleX)
     .setHeight(height * scaleY)

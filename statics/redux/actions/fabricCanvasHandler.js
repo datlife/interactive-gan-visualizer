@@ -1,6 +1,6 @@
-import * as types from '../constants';
 import {fabric} from 'fabric';
-import axios from 'axios';
+import * as types from '../constants';
+import * as API from '../../api/objectDetection';
 
 export const initialize = (id, canvas) => (dispatch, getState) => {
   dispatch({
@@ -10,22 +10,32 @@ export const initialize = (id, canvas) => (dispatch, getState) => {
 
 export const detectObjects = (id) => (dispatch, getState) =>{
   const image = getState().images.byId[id];
-  var formData = new FormData();
-  formData.append("id", image.id);  
-  formData.append("image", image.original);  
   
-  // Creating post request
-  axios.post('http://localhost:5000/detect/',formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'}})
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
+  const reader = new FileReader();
+  reader.readAsDataURL(image.file);      
+  reader.onload = () => {
+    let result = API.detect_object(image.id, reader.result)
+    result.then(
+      function(res){
+        console.log(res)
+        res.data.forEach(e => {
+          console.log()
+          const rect = new fabric.Rect({
+            top: e.top,
+            left: e.left,
+            width: e.width,
+            height: e.height,
+            hasBorder: true,
+            stroke: 'yellow',
+            strokeWidth: 3,
+            fill:'transparent'
+          });
+          dispatch(addObject(image.id, rect))             
+      })
     });
-
-}
+    dispatch({type: types.DETECT_OBJECT, id:id})             
+  }
+};   
 
 export const addObject = (id, object) => (dispatch, getState) => {    
   const canvas_json = getState().views.byId[id].canvas;

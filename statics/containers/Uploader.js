@@ -19,7 +19,10 @@ class Uploader extends React.Component {
           <Dropzone
             className="dropzone"
             accept="image/jpeg, image/png"
-            onDrop={(new_images) => ImageHandler.uploadImage(new_images)}>
+            onDrop={(new_images) => {
+              ImageHandler.uploadImage(new_images)
+              
+            }}>
             <div className="d-flex align-items-center">
               <p className="lead">Click or Drop to upload more images.</p>
             </div>
