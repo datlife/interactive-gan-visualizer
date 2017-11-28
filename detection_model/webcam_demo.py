@@ -1,39 +1,51 @@
 import cv2
 import time
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+import tensorflow as tf
 
+
+from collections import deque 
 from multiprocessing import Queue, Pool
 
-from utils.webcam import WebcamVideoStream, FPS
 from client import ObjectDetectionServer
+from utils.webcam import WebcamVideoStream, FPS
+from PIL import Image, ImageDraw, ImageFont
 
-detection_model = 'ssd'
-detector = ObjectDetectionServer(server='localhost:9000', detection_model=detection_model)
+# Command line arguments
+tf.app.flags.DEFINE_string('server', 'localhost:9000', 'PredictionService host:port')
+tf.app.flags.DEFINE_string('model', 'ssd', 'tf serving model (yolov2, ssd, fasterrcnn')
+FLAGS = tf.app.flags.FLAGS
 
+detection_model = FLAGS.model
+detector = ObjectDetectionServer(server=FLAGS.server, detection_model=detection_model)
 
-def _main_():
-
-    width  = 300
-    height = 300
-
+def main(_):
     video_capture = WebcamVideoStream(0).start()
     fps = FPS().start()
 
     input_q  = Queue(maxsize=5)
-    output_q = Queue(maxsize=5)
-    pool     = Pool(2, worker, (input_q, output_q))
+    output_q = Queue(maxsize=2)
+    pool     = Pool(1, worker, (input_q, output_q))
 
+    boxes   = []
+    classes = []
+    scores  = []
     while True:
-        frame = video_capture.read()
-        frame = cv2.resize(frame, (width, height))
-        input_q.put(frame)
-        
-        frame = output_q.get()
-        cv2.imshow('Video', frame)
-        fps.update()
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        frame = video_capture.read()
+
+	if input_q.full():
+	  input_q.get()
+        input_q.put(frame)
+
+        if not output_q.empty():
+           boxes, classes, scores = output_q.get()
+
+        frame = draw(frame, boxes, classes, scores)
+        print("Running...", input_q.qsize())
+        cv2.imshow('Video', frame)
+        fps.update()
 
     fps.stop()
     video_capture.stop()
@@ -46,7 +58,7 @@ def worker(input_q, output_q):
     fps = FPS().start()
     while True:
         fps.update()
-        frame = input_q.get()
+	frame = input_q.get()
         output_q.put(detect_objects_in(frame))
     fps.stop()
 
@@ -56,14 +68,10 @@ def detect_objects_in(frame):
 
     predict = time.time()
     data = detector.predict(frame)
-
+    print("Prediction in {}".format(time.time()-predict))
     # boxes, classes, scores = filter_out(threshold=0.5, data=data)
     boxes, classes, scores = data
-
-    drawing = time.time()
-    frame = draw(frame, boxes, classes, scores)
-    print("Prediction in {} || Drawing in {}".format(time.time()-predict, time.time()-drawing))
-    return frame
+    return boxes, classes, scores
 
 
 def draw(img, bboxes, classes, scores):
@@ -73,6 +81,8 @@ def draw(img, bboxes, classes, scores):
     :param boxes:
     :return:
     """
+    if not bboxes:
+	return img
     height, width, _ = img.shape
     stretch = width / float(height)
     image = Image.fromarray(img)
@@ -116,8 +126,7 @@ def filter_out(threshold, data):
             new_boxes.append(b)
             new_classes.append(c)
             new_scores.append(s)
-
     return new_boxes, new_classes, new_scores
 
 if __name__ == "__main__":
-    _main_()
+    tf.app.run()

@@ -1,7 +1,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
-# Communication to TensorFlow server via gRPC
 import time
 import cv2
 import numpy as np
@@ -11,12 +10,6 @@ import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
-
-
-# Command line arguments
-tf.app.flags.DEFINE_string('server', 'localhost:9000', 'PredictionService host:port')
-tf.app.flags.DEFINE_string('image', '', 'path to image in JPEG format')
-FLAGS = tf.app.flags.FLAGS
 
 
 class ObjectDetectionServer(object):
@@ -45,7 +38,7 @@ class ObjectDetectionServer(object):
         request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto(image))
 
         pred  = time.time()
-        result = self.stub.Predict(request, 5.0)  # 5 secs timeout
+        result = self.stub.Predict(request, 10.0)  # 5 secs timeout
 
         if self.model == 'yolov2':
             num_detections = -1
@@ -87,4 +80,3 @@ if __name__ == '__main__':
     setup = "from __main__ import ObjectDetectionServer, cv2"
     command = "ObjectDetectionServer('localhost:9000','ssd', verbose=True).predict(cv2.imread('./assets/example.jpg'))"
     print(timeit.timeit(command, setup=setup))
-    # predict()

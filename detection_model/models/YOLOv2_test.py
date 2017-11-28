@@ -7,7 +7,6 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 
-
 from models.YOLOv2 import YOLOv2, yolov2_preprocess_func
 from models.custom_layers import ImageResizer
 from webcam_demo import draw
