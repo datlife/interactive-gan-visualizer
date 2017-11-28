@@ -3,9 +3,8 @@ import time
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from Queue import Queue
-from collections import deque
 from threading import Thread
+from multiprocessing import Queue, Pool
 
 from utils.webcam import WebcamVideoStream, FPS
 from utils.map_idx_to_label import map_idx_to_labels, map_idx
@@ -15,41 +14,31 @@ from cfg import CATEGORIES
 detection_model = 'ssd'
 detector = ObjectDetectionServer(server='localhost:9000', detection_model=detection_model)
 
+if detection_model is 'yolov2':
+    label_dict = map_idx_to_labels(CATEGORIES)
+else:
+    label_dict = map_idx('./assets/coco_ssd.txt')
 
 def _main_():
 
-    video_capture = WebcamVideoStream(src=0).start()
+    width  = 300
+    height = 300
+
+    video_capture = WebcamVideoStream(0).start()
     fps = FPS().start()
 
-    if detection_model is 'yolov2':
-        label_dict = map_idx_to_labels(CATEGORIES)
-    else:
-        label_dict = map_idx('./assets/coco_ssd.txt')
-        print(label_dict)
-
-    width = 640
-    height = 480
-
-    input_q  = Queue(10)
-    output_q = deque(maxlen=5)
-
-    for i in range(1):
-        t = Thread(target=worker, args=(input_q, output_q))
-        t.daemon = True
-        t.start()
+    input_q  = Queue(maxsize=5)
+    output_q = Queue(maxsize=5)
+    pool     = Pool(2, worker, (input_q, output_q))
 
     while True:
         frame = video_capture.read()
+        frame = cv2.resize(frame, (300, 300)) 
         input_q.put(frame)
-        if len(output_q):
-            data = output_q.popleft()
-            boxes, classes, scores = filter_out(threshold=0.5, data=data)
-            frame = draw(frame, (width, height), label_dict, boxes, classes, scores)
-            output_q.clear()
-
+        
+        frame = output_q.get()
         cv2.imshow('Video', frame)
         fps.update()
-
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
@@ -61,23 +50,38 @@ def _main_():
 
 
 def worker(input_q, output_q):
-    global detector
     fps = FPS().start()
     while True:
         fps.update()
         frame = input_q.get()
-        output_q.append(detector.predict(frame))
+        output_q.put(detect_objects_in(frame))
     fps.stop()
 
+import time
+def detect_objects_in(frame):
+    global detector
+    global label_dict
+    
+    predict = time.time()
+    data = detector.predict(frame)
 
-def draw(img, img_shape, label_dict, bboxes, classes, scores):
+    # boxes, classes, scores = filter_out(threshold=0.5, data=data)
+    boxes, classes, scores = data
+    classes = [label_dict[int(c)] for c in classes]
+    
+    drawing = time.time()
+    frame = draw(frame, boxes, classes, scores)
+    print("Prediction in {} || Drawing in {}".format(time.time()-predict, time.time()-drawing))
+    return frame
+
+def draw(img, bboxes, classes, scores):
     """
     Drawing Bounding Box on Image
     :param img:
     :param boxes:
     :return:
     """
-    width, height = img_shape
+    height, width, _ = img.shape
     stretch = width / float(height)
     image = Image.fromarray(img)
     font = ImageFont.truetype(
@@ -88,14 +92,13 @@ def draw(img, img_shape, label_dict, bboxes, classes, scores):
     draw = ImageDraw.Draw(image)
 
     for box, category, score in zip(bboxes, classes, scores):
-        name = label_dict[int(category)]
         box = box * np.array([width*(1/stretch), height*stretch, width*(1/stretch), height*stretch])
         y1, x1, y2, x2 = [int(i) for i in box]
 
         p1 = (x1, y1)
         p2 = (x2, y2)
 
-        label       = '{} {:.2f} %   '.format(name, score * 100)
+        label       = '{} {:.2f} %   '.format(category, score * 100)
         label_size  = draw.textsize(label)
         text_origin = np.array([p1[0], p1[1] + 1])
 
