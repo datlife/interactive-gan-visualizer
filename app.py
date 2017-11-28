@@ -1,81 +1,57 @@
 """
 Main application
 """
-import re
 import json
-import urllib2
-import numpy as np 
-from PIL import Image
-from flask import Flask, jsonify, request
 
-from detection_model.client import ObjectDetectionServer
 
-app      = Flask(__name__)
-detector = ObjectDetectionServer(server="locahost:9000", detection_model="ssd")
 
-@app.route('/')
-def index():
-    return "Hello, World!"
+from flask import Flask
+from flask import jsonify, request, Response
+
+from detector import detect_objects
+app    = Flask(__name__)
+
 
 @app.route('/detect/', methods=["POST"])
-def predict():
+def detect():
     data = json.dumps(request.form.to_dict())
     data = json.loads(data)
-    image_url = data["image"]
-    image_id  = data["id"]
 
-    # Read blob into array
-    result = read_blob(image_url)
-    print(type(result))
-    # image = np.array(Image.open())
-    # print(image.shape)
-    response = jsonify({'some': 'data'})
+    try:
+        detections    = detect_objects(data['image'])
+    except Exception as e:
+        print(e)
+        return Response(jsonify({'msg': 'TensorFlow Serving not available'}), status=503)
+
+    response = jsonify(detections)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-    # Format image
-    # bboxes, scores, classes = detector.predict(image)
 
-    # # Convert index into true label
-    # classes = [labels_map[idx] for idx in classes]
+@app.route('/debug/', methods=["GET"])
+def update_debug():
+    data = None
 
-    # # TODO: Only need car objects -- filter out everything else
-
-    # # Convert detections into Fabric Rect Object for rendering
-    # rects = format_detetections(image.shape, bboxes, scores, classes)
-
-    # return jsonify(rects)
+    data_url = _debug_mask(data)
+    response = jsonify(data_url)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
-def format_detetections(img_shape, bboxes, scores, classes):
+def _debug_mask(bboxes):
+    import base64
+    import numpy as np
+    from cStringIO import StringIO
+    from PIL import Image
 
-    width, height, _ = img_shape 
-    stretch = width / float(height)
-    Rects = []
-    for box, score, category in zip(bboxes, scores, classes):
-        box = box * np.array([width*(1/stretch), height*stretch, width*(1/stretch), height*stretch])
-        y1, x1, y2, x2 = [int(i) for i in box]
-        rect = {
-            top:  y1,        left: x1,
-            width: y2 - y1, height: x2 - x1,
-            hasBorder: true,
-            stroke: 'yellow',
-            strokeWidth: 3,
-            fill:'transparent'
-        }
-        Rects.append(rect)
 
-    return Rects
+    mask = np.zeros((400, 400), np.uint8)
+    img_mask = Image.fromarray(mask)
+    output = StringIO()
+    img_mask.save(output, format='JPEG')
 
-def read_blob(image_url):
-    # fake user agent of safari
-    url = re.search(r'blob:(.*)', image_url.encode('utf-8'))
-    url = url.group(1)
-    fake_useragent = 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25'
-    r = urllib2.Request(url, headers={'User-Agent': fake_useragent})
-    f = urllib2.urlopen(r)
-    return f.read()
+    data_url = base64.b64encode(output.getvalue())
 
+    return data_url
 if __name__ == "__main__":
     app.run(debug=True)
-    print("Server is started")

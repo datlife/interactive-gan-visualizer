@@ -9,19 +9,15 @@ detection_model = 'ssd'
 detector = ObjectDetectionServer(server='localhost:9000', detection_model=detection_model)
 
 
-def detect_objects_in(image_base64):
+def detect_objects(image_base64):
     global detector
-
     # Format image
     image = re.sub('^data:image/.+;base64,', '', image_base64).decode('base64')
     image = Image.open(cStringIO.StringIO(image))
     image = np.asarray(image.resize((400, 400)))
 
-    data = detector.predict(image)
-
     # boxes, classes, scores = filter_out(threshold=0.5, data=data)
-    boxes, classes, scores = data
-
+    boxes, classes, scores = detector.predict(image)
     rects = covert_to_fabric_rect(image.shape, boxes, scores, classes)
 
     return rects
@@ -43,5 +39,4 @@ def covert_to_fabric_rect(img_shape, boxes, scores, classes):
             'probabilities': score
         }
         rects.append(rect)
-
     return rects
