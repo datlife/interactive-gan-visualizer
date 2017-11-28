@@ -3,12 +3,11 @@ import time
 import numpy as np
 import tensorflow as tf
 
-
 from collections import deque 
 from multiprocessing import Queue, Pool
 
 from client import ObjectDetectionServer
-from utils.webcam import WebcamVideoStream, FPS
+from src.utils.webcam import WebcamVideoStream, FPS
 from PIL import Image, ImageDraw, ImageFont
 
 # Command line arguments

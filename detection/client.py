@@ -19,9 +19,9 @@ class ObjectDetectionServer(object):
         self.model = detection_model
         self.verbose = verbose
         if detection_model is 'yolov2':
-            self.label_dict = map_idx_to_labels('./assets/coco_categories.txt')
+            self.label_dict = map_idx_to_labels('../assets/coco/yolov2_categories.txt')
         else:
-            self.label_dict = map_idx('./assets/coco_ssd.txt')
+            self.label_dict = map_idx('../assets/coco/ssd_categories.txt')
 
         channel   = implementations.insecure_channel(self.host, int(self.port))
         self.stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)

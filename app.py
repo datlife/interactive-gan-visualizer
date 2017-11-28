@@ -2,9 +2,6 @@
 Main application
 """
 import json
-
-
-
 from flask import Flask
 from flask import jsonify, request, Response
 
@@ -43,7 +40,6 @@ def _debug_mask(bboxes):
     import numpy as np
     from cStringIO import StringIO
     from PIL import Image
-
 
     mask = np.zeros((400, 400), np.uint8)
     img_mask = Image.fromarray(mask)

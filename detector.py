@@ -3,7 +3,7 @@ import cStringIO
 
 import numpy as np
 from PIL import Image
-from detection_model.client import ObjectDetectionServer
+from detection.client import ObjectDetectionServer
 
 detection_model = 'ssd'
 detector = ObjectDetectionServer(server='localhost:9000', detection_model=detection_model)
