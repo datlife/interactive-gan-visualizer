@@ -27,7 +27,7 @@ class Toolbar extends React.Component {
       <div className="d-flex flex-row">
         <div className="p-2">
           <div className="d-flex flex-column">
-            <RaisedButton className="mt-0" label="Detect" primary={true}/>
+            <RaisedButton className="mt-0" label="Detect" primary={true} onClick={this._detect.bind(this)}/>
             <RaisedButton className="mt-2" label="Process" secondary={true}/>
             <Toggle       className="mt-3 toggle" label="Debug" 
                           onToggle={(e) => ImageHandler.changeDebugMode(canvas_id, isDebugging)}/>
@@ -54,6 +54,11 @@ class Toolbar extends React.Component {
     )
   }
 
+  _detect = () => {
+    let {canvas_id, fabricCanvasActions} = this.props;
+    fabricCanvasActions.detectObjects(canvas_id);
+  }
+  
   _addBox = () => {
     let {canvas_id, fabricCanvasActions} = this.props;
     const rect = new fabric.Rect({

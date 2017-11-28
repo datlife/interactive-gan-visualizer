@@ -10,10 +10,9 @@ export default combineReducers({byId: byId, allIds: allIds})
 function byId(state = {}, action) {
   switch (action.type) {
     case types.UPLOAD_IMAGE:
-      {
-        let new_images = action.new_images;        
-        return new_images.reduce(function (state, image) {
-          const img_id = image.preview.split("/").pop(); // get the last element of array
+      {         
+        return  action.new_images.reduce(function (state, image) {    
+          const img_id = image.preview.split("/").pop();
           return {
             ...state,
             [img_id]: {

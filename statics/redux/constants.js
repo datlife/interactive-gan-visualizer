@@ -8,6 +8,7 @@ export const MODIFY_CANVAS = 'MODIFY_CANVAS';
 export const TO_DATA_URL = 'TO_DATA_URL';
 
 export const ADD_OBJECT      = 'ADD_OBJECT';
+export const DETECT_OBJECT   = 'DETECT_OBJECT';
 
 export const OBJECT_SELECTED = 'OBJECT_SELECTED';
 export const OBJECT_MOVING   = 'OBJECT_MOVING';
