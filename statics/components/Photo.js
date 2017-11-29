@@ -31,16 +31,24 @@ class Photo extends React.Component {
         canvasActions.initialize(id, canvas);                
       }.bind(canvas),{ crossOrigin: 'Anonymous' });
 
-      canvas.on('object:scaling',   (evt) => objectHandlder.scaling(canvas, id, evt));
+      canvas.on('object:modified',   (evt) => objectHandlder.scaling(canvas, id, evt));
+      canvas.on('object:moving',   (evt) => objectHandlder.moving(canvas, id, evt));      
       canvas.on('object:selected',   (evt) => objectHandlder.select(canvas, id, evt));
     } 
 
     reload(){
       let {view, id} = this.props;
       if(view){
-        let canvas = this.fabricCanvas;
+        let canvas = this.fabricCanvas;        
         canvas.loadFromJSON(view.canvas);
-        console.log("Reloading "+ id) 
+
+        if(view.confirmed){
+          console.log("CONFIRMED")
+          let fixed_obj =   canvas.getObjects()[0]
+          console.log(fixed_obj)
+        }
+
+        console.log("Reloading cavas "+ id) 
       }   
     }
 
@@ -63,30 +71,3 @@ class Photo extends React.Component {
 }
 
 export default connect(null, mapDispatchToProps)(Photo);
-
-
-
-      
-      // fabricCanvas.add(object);
-      // fabricCanvas.setActiveObjesct(object);
-      // if (bboxes){
-      //   console.log("I am adding new bboxes in " + id);
-      //   let objects = bboxes.bboxes;
-      //   console.log(objects);
-      //   fabric.util.enlivenObjects(objects, function(objects) {
-      //     var origRenderOnAddRemove = canvas.renderOnAddRemove;
-      //     canvas.renderOnAddRemove = false;
-          
-      //     objects.forEach(function(o) {
-      //       canvas.add(o);
-      //     });
-        
-      //     canvas.renderOnAddRemove = origRenderOnAddRemove;
-      //     canvas.renderAll();
-      //   });
-
-
-      // canvas.on('object:moving',   (evt) => objectHandlers.moving(evt.target));
-      // canvas.on('object:modified', (evt) => objectHandlers.modified(evt.target));
-      // canvas.on('object:scaling',  (evt) => objectHandlers.scaling(evt.target));
-      // canvas.on('selection:cleared', ()  => objectHandlers.cleared()); 

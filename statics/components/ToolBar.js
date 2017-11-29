@@ -21,6 +21,16 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Toolbar extends React.Component {
 
+  _detect = () => {
+    let {canvas_id, fabricCanvasActions} = this.props;
+    fabricCanvasActions.detectObjects(canvas_id);
+  }
+  
+  _confirm= () => {
+    let {canvas_id,fabricCanvasActions } = this.props;
+    fabricCanvasActions.confirmSelectedObject(canvas_id);
+  }
+
   render() {
     let {canvas_id, ImageHandler, isDebugging} = this.props;
     return (
@@ -28,7 +38,7 @@ class Toolbar extends React.Component {
         <div className="p-2">
           <div className="d-flex flex-column">
             <RaisedButton className="mt-0" label="Detect" primary={true} onClick={this._detect.bind(this)}/>
-            <RaisedButton className="mt-2" label="Process" secondary={true}/>
+            <RaisedButton className="mt-2" label="clear" secondary={true} onClick={this._clear.bind(this)}/>
             <Toggle       className="mt-3 toggle" label="Debug" 
                           onToggle={(e) => ImageHandler.changeDebugMode(canvas_id, isDebugging)}/>
           </div>
@@ -45,25 +55,15 @@ class Toolbar extends React.Component {
             {/* <IconButton className="mt-0">
                 <ClearIcon />
             </IconButton> */}
-            <IconButton className="mt-0" onClick={this._save.bind(this)}>
+            {/* <IconButton className="mt-0" onClick={this._save.bind(this)}>
                 <SaveIcon/>
-            </IconButton>
+            </IconButton> */}
           </Card>
         </div>
       </div>
     )
   }
 
-  _detect = () => {
-    let {canvas_id, fabricCanvasActions} = this.props;
-    fabricCanvasActions.detectObjects(canvas_id);
-  }
-  
-  _confirm= () => {
-    let {canvas_id} = this.props;
-    console.log("dispatching confimation" + canvas_id)
-    fabricCanvasActions.confirmSelectedObject(canvas_id);
-  }
   _addBox = () => {
     let {canvas_id, fabricCanvasActions} = this.props;
     const rect = new fabric.Rect({
@@ -79,8 +79,9 @@ class Toolbar extends React.Component {
     fabricCanvasActions.addObject(canvas_id, rect);    
   }
 
-  _save(){
-    this.props.fabricCanvasActions.toDataURL();    
+  _clear(){
+    let {canvas_id, fabricCanvasActions} = this.props;    
+    this.props.fabricCanvasActions.clear(canvas_id);    
   }
 }
 

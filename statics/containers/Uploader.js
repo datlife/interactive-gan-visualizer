@@ -20,6 +20,7 @@ class Uploader extends React.Component {
             className="dropzone"
             accept="image/jpeg, image/png"
             onDrop={(new_images) => {
+              console.log(new_images)
               ImageHandler.uploadImage(new_images)
               
             }}>

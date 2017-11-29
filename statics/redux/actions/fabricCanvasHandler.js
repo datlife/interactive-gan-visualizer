@@ -8,18 +8,32 @@ export const initialize = (id, canvas) => (dispatch, getState) => {
       id: id, canvas: JSON.stringify(canvas) });
 };
 
-export const detectObjects = (id) => (dispatch, getState) =>{
-  const image = getState().images.byId[id];
+export const confirmSelectedObject = (id) => (dispatch, getState) =>{  
+  const view = getState().views.byId[id];  
   
+  var canvas_json = Object.assign({}, JSON.parse(view.canvas))
+  
+  const moveable_box = view.selected
+  const fix_box      = view.selected.set({hasControl: false, selectable: false})
+
+  canvas_json['objects'] = new Array(fix_box, moveable_box);
+
+  dispatch({type: types.CONFIRM_SELECT, 
+            id: id, 
+            confirmed: true,
+            canvas: JSON.stringify(canvas_json)})
+};
+
+export const detectObjects = (id) => (dispatch, getState) =>{
+  // Clear all existing bounding boxes and generate new ones from server
+  const image = getState().images.byId[id];
   const reader = new FileReader();
   reader.readAsDataURL(image.file);      
   reader.onload = () => {
-    
     let result = API.detect_object(image.id, reader.result)
     result.then(
       function(res){
         var detected_ojects =  new Array();    
-        console.log(res.data)
         res.data.forEach(e => {
           const rect = new fabric.Rect({
             top:   e.top,
@@ -32,6 +46,7 @@ export const detectObjects = (id) => (dispatch, getState) =>{
             fill:'transparent'
           });
           detected_ojects.push(rect)})
+
         const canvas_json = getState().views.byId[id].canvas;
         var new_canvas_json = Object.assign({}, JSON.parse(canvas_json))
         new_canvas_json['objects'] = detected_ojects   
@@ -42,16 +57,6 @@ export const detectObjects = (id) => (dispatch, getState) =>{
   }
 };   
 
-export const confirmSelectedObject = (id) => (dispatch, getState) => {    
-  console.log("confirming")
-  
-  const view = getState().views.byId[id];
-  var new_canvas_json = Object.assign({}, JSON.parse(view.canvas))
-  new_canvas_json['objects'] = view.selected;
-  console.log(new_canvas_json)
-  dispatch({type: types.CONFIRM_SELECT, id: id, canvas: JSON.stringify(new_canvas_json)})
-  
-};
 
 export const addObject = (id, object) => (dispatch, getState) => {    
   const canvas_json = getState().views.byId[id].canvas;
@@ -61,8 +66,12 @@ export const addObject = (id, object) => (dispatch, getState) => {
   dispatch({type: types.ADD_OBJECT, id: id, canvas: JSON.stringify(new_canvas_json)});
 };
 
-export const toDataURL = (id) => (dispatch, getState) => {
-  const fabricCanvas = getState().views.byId[id].canvas;
-  const dataURL = fabricCanvas.toDataURL({format: 'jpeg', quality: 0.8});
-  dispatch({type: types.TO_DATA_URL, payload: dataURL}); // and id
+export const clear = (id) => (dispatch, getState) => {
+  const view = getState().views.byId[id];  
+  var canvas_json = Object.assign({}, JSON.parse(view.canvas))
+  canvas_json['objects'] = [];
+  dispatch({type: types.CLEAR_CANVAS, 
+    id: id, 
+    confirmed: false,
+    canvas: JSON.stringify(canvas_json)})
 }

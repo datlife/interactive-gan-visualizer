@@ -61,12 +61,13 @@ function byId(state = {}, action) {
       }
     }
     case types.CONFIRM_SELECT:{
-      let {id, canvas} = action;
+      let {id, canvas, confirmed} = action;
       return {
         ...state,
         [id]:{
           ...state[id],
-          canvas: canvas
+          canvas: canvas,
+          confirmed: true
         }
       }
     }
@@ -78,11 +79,18 @@ function byId(state = {}, action) {
              [`debug-${action.id}`]: gone, ...new_state} = state;
         return new_state;
       }
-    case types.CANVAS_REFRESH:
+    case types.CLEAR_CANVAS:
       {
-        return state;
+        let {id, canvas} = action;
+        return {
+          ...state,
+          [id]:{
+            ...state[id],
+            canvas: canvas,
+            confirmed: false            
+          }
+        }      
       }
-
     default:
       return state
   }

@@ -5,8 +5,8 @@ export const TOGGLE_DEBUG    = 'TOGGLE_DEBUG';
 export const CONFIRM_SELECT  = 'CONFIRM_SELECT';
  
 export const INITIALIZE_CANVAS = 'INITIALIZE_CANVAS';
-export const MODIFY_CANVAS = 'MODIFY_CANVAS';
-export const TO_DATA_URL = 'TO_DATA_URL';
+export const MODIFY_CANVAS     = 'MODIFY_CANVAS';
+export const CLEAR_CANVAS      = 'CLEAR_CANVAS';
 
 export const ADD_OBJECT      = 'ADD_OBJECT';
 export const DETECT_OBJECT   = 'DETECT_OBJECT';
