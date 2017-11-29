@@ -6,17 +6,18 @@ import tensorflow as tf
 from collections import deque 
 from multiprocessing import Queue, Pool
 
-from client import ObjectDetectionServer
-from src.utils.webcam import WebcamVideoStream, FPS
 from PIL import Image, ImageDraw, ImageFont
+from client import ObjectDetectionServer
+from src.utils.label_map import get_labels
+from src.utils.webcam import WebcamVideoStream, FPS
 
 # Command line arguments
 tf.app.flags.DEFINE_string('server', 'localhost:9000', 'PredictionService host:port')
 tf.app.flags.DEFINE_string('model', 'ssd', 'tf serving model (yolov2, ssd, fasterrcnn')
 FLAGS = tf.app.flags.FLAGS
 
-detection_model = FLAGS.model
-detector = ObjectDetectionServer(server=FLAGS.server, detection_model=detection_model)
+model = FLAGS.model
+detector = ObjectDetectionServer('localhost:9000', model, get_labels(model))
 
 def main(_):
     video_capture = WebcamVideoStream(0).start()
@@ -95,10 +96,8 @@ def draw(img, bboxes, classes, scores):
     for box, category, score in zip(bboxes, classes, scores):
         box = box * np.array([width*(1/stretch), height*stretch, width*(1/stretch), height*stretch])
         y1, x1, y2, x2 = [int(i) for i in box]
-
         p1 = (x1, y1)
         p2 = (x2, y2)
-
         label       = '{} {:.2f} %   '.format(category, score * 100)
         label_size  = draw.textsize(label)
         text_origin = np.array([p1[0], p1[1] + 1])
@@ -109,17 +108,15 @@ def draw(img, bboxes, classes, scores):
 
         draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)], fill=tuple(color))
         draw.text(tuple(text_origin), label, fill=(0, 0, 0), label_size=2, font=font)
-
     del draw
     return np.array(image)
 
 
 def filter_out(threshold, data):
     boxes, classes, scores = data
-
-    new_boxes =[]
+    new_boxes   = []
     new_classes = []
-    new_scores =[]
+    new_scores  = []
     for b, c, s in zip(boxes, classes, scores):
         if s > threshold:
             new_boxes.append(b)

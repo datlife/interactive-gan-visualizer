@@ -1,11 +1,18 @@
-def map_idx_to_labels(categories_file):
+def get_labels(model):
+   if model is 'yolov2':
+       label_dict = yolov2_map('assets/coco/yolov2_categories.txt')
+   else:
+       label_dict = ssd_map('assets/coco/ssd_categories.txt')
+   return label_dict
+
+def yolov2_map(categories_file):
     with open(categories_file, mode='r') as txt_file:
         class_names = [c.strip() for c in txt_file.readlines()]
     class_names = {v: k for v, k in enumerate(class_names)}
     return class_names
 
 
-def map_idx(categories_file):
+def ssd_map(categories_file):
     with open(categories_file, mode='r') as txt_file:
         values = [c.strip() for c in txt_file.readlines()]
     class_names = dict()

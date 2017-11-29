@@ -1,8 +1,9 @@
 from __future__ import print_function
 from __future__ import absolute_import
-
-import time
+import os
 import cv2
+import time
+
 import numpy as np
 import tensorflow as tf
 
@@ -14,15 +15,11 @@ from tensorflow_serving.apis import prediction_service_pb2
 
 class ObjectDetectionServer(object):
 
-    def __init__(self, server, detection_model, verbose=False):
+    def __init__(self, server, detection_model,  label_dict, verbose=False):
         self.host, self.port = server.split(':')
         self.model = detection_model
         self.verbose = verbose
-        if detection_model is 'yolov2':
-            self.label_dict = map_idx_to_labels('../assets/coco/yolov2_categories.txt')
-        else:
-            self.label_dict = map_idx('../assets/coco/ssd_categories.txt')
-
+	self.label_dict = label_dict
         channel   = implementations.insecure_channel(self.host, int(self.port))
         self.stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
 
@@ -57,23 +54,6 @@ class ObjectDetectionServer(object):
             print("Server Prediction in {:.3f} sec || Total {:.3} sec".format(time.time() - pred, time.time() - start))
 
         return boxes, classes, scores
-
-
-def map_idx_to_labels(categories_file):
-    with open(categories_file, mode='r') as txt_file:
-        class_names = [c.strip() for c in txt_file.readlines()]
-    class_names = {v: k for v, k in enumerate(class_names)}
-    return class_names
-
-
-def map_idx(categories_file):
-    with open(categories_file, mode='r') as txt_file:
-        values = [c.strip() for c in txt_file.readlines()]
-    class_names = dict()
-    for s in values:
-        id, key = s.split(':')
-        class_names[int(id)] = key
-    return class_names
 
 if __name__ == '__main__':
     import timeit
