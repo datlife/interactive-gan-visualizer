@@ -1,8 +1,9 @@
 // Define actions
-export const UPLOAD_IMAGE = 'UPLOAD_IMG';
-export const DELETE_IMAGE = 'DELETE_IMG';
-export const TOGGLE_DEBUG  = 'TOGGLE_DEBUG';
-
+export const UPLOAD_IMAGE    = 'UPLOAD_IMG';
+export const DELETE_IMAGE    = 'DELETE_IMG';
+export const TOGGLE_DEBUG    = 'TOGGLE_DEBUG';
+export const CONFIRM_SELECT  = 'CONFIRM_SELECT';
+ 
 export const INITIALIZE_CANVAS = 'INITIALIZE_CANVAS';
 export const MODIFY_CANVAS = 'MODIFY_CANVAS';
 export const TO_DATA_URL = 'TO_DATA_URL';

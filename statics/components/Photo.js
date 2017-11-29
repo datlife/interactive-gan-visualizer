@@ -33,7 +33,6 @@ class Photo extends React.Component {
 
       canvas.on('object:scaling',   (evt) => objectHandlder.scaling(canvas, id, evt));
       canvas.on('object:selected',   (evt) => objectHandlder.select(canvas, id, evt));
-      
     } 
 
     reload(){

@@ -14,36 +14,52 @@ export const detectObjects = (id) => (dispatch, getState) =>{
   const reader = new FileReader();
   reader.readAsDataURL(image.file);      
   reader.onload = () => {
+    
     let result = API.detect_object(image.id, reader.result)
     result.then(
       function(res){
-        console.log(res)
+        var detected_ojects =  new Array();    
+        console.log(res.data)
         res.data.forEach(e => {
-          console.log()
           const rect = new fabric.Rect({
-            top: e.top,
-            left: e.left,
+            top:   e.top,
+            left:  e.left,
             width: e.width,
-            height: e.height,
+            height:e.height,
             hasBorder: true,
             stroke: 'yellow',
             strokeWidth: 3,
             fill:'transparent'
           });
-          dispatch(addObject(image.id, rect))             
-      })
-    });
-    dispatch({type: types.DETECT_OBJECT, id:id})             
+          detected_ojects.push(rect)})
+        const canvas_json = getState().views.byId[id].canvas;
+        var new_canvas_json = Object.assign({}, JSON.parse(canvas_json))
+        new_canvas_json['objects'] = detected_ojects   
+        dispatch({type: types.DETECT_OBJECT, 
+                  id:id, 
+                  canvas: JSON.stringify(new_canvas_json) })        
+    }); 
   }
 };   
+
+export const confirmSelectedObject = (id) => (dispatch, getState) => {    
+  console.log("confirming")
+  
+  const view = getState().views.byId[id];
+  var new_canvas_json = Object.assign({}, JSON.parse(view.canvas))
+  new_canvas_json['objects'] = view.selected;
+  console.log(new_canvas_json)
+  dispatch({type: types.CONFIRM_SELECT, id: id, canvas: JSON.stringify(new_canvas_json)})
+  
+};
 
 export const addObject = (id, object) => (dispatch, getState) => {    
   const canvas_json = getState().views.byId[id].canvas;
   var new_canvas_json = Object.assign({}, JSON.parse(canvas_json))
   new_canvas_json['objects'].push(object)
+
   dispatch({type: types.ADD_OBJECT, id: id, canvas: JSON.stringify(new_canvas_json)});
 };
-
 
 export const toDataURL = (id) => (dispatch, getState) => {
   const fabricCanvas = getState().views.byId[id].canvas;

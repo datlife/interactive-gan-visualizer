@@ -36,7 +36,7 @@ class Toolbar extends React.Component {
 
         <div className="p-2">
           <Card className="d-flex flex-column">
-            <IconButton className="mt-0">
+            <IconButton className="mt-0" onClick={this._confirm.bind(this)}>
                 <DoneIcon />
             </IconButton>
             <IconButton className="mt-0" onClick={this._addBox.bind(this)}>
@@ -59,6 +59,11 @@ class Toolbar extends React.Component {
     fabricCanvasActions.detectObjects(canvas_id);
   }
   
+  _confirm= () => {
+    let {canvas_id} = this.props;
+    console.log("dispatching confimation" + canvas_id)
+    fabricCanvasActions.confirmSelectedObject(canvas_id);
+  }
   _addBox = () => {
     let {canvas_id, fabricCanvasActions} = this.props;
     const rect = new fabric.Rect({

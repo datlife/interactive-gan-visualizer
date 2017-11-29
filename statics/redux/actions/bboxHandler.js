@@ -4,7 +4,8 @@ import * as types from '../constants';
 export const selected = createAction(types.OBJECT_SELECTED);
 export const moving = createAction(types.OBJECT_MOVING);
 
-export const select =(canvas, id, event) => (dispatch, getState) => {
+export const select = (canvas, id, event) => (dispatch, getState) => {
+  dispatch({type: types.OBJECT_SELECTED, id: id, object: event.target})
 };
 
 export const scaling =(canvas, id, event) => (dispatch, getState) => {

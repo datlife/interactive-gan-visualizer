@@ -15,11 +15,21 @@ function byId(state = {}, action) {
           [id]: {
             ...state[id],
             id: id,
-            canvas: canvas   
+            canvas: canvas,
+            selected: null,   
           }
         }
       }
-     
+    case types.DETECT_OBJECT:{
+      let {id, canvas} = action;
+      return {
+        ...state,
+        [id]:{
+          ...state[id],
+          canvas: canvas
+        }
+      }
+    }   
     case types.ADD_OBJECT:{
       let {id, canvas} = action;
       return {
@@ -40,6 +50,26 @@ function byId(state = {}, action) {
         }
       }
     }  
+    case types.OBJECT_SELECTED:{
+      let {id, object} = action;
+      return {
+        ...state,
+        [id]:{
+          ...state[id],
+          selected: object
+        }
+      }
+    }
+    case types.CONFIRM_SELECT:{
+      let {id, canvas} = action;
+      return {
+        ...state,
+        [id]:{
+          ...state[id],
+          canvas: canvas
+        }
+      }
+    }
     case types.DELETE_IMAGE:
       {
         // desctructor using Spread Operator
