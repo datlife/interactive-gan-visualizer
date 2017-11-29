@@ -1,9 +1,9 @@
 def get_labels(model):
-   if model is 'yolov2':
-       label_dict = yolov2_map('assets/coco/yolov2_categories.txt')
+   if model == 'yolov2':
+       return yolov2_map('assets/coco/yolov2_categories.txt')
    else:
-       label_dict = ssd_map('assets/coco/ssd_categories.txt')
-   return label_dict
+       return ssd_map('assets/coco/ssd_categories.txt')
+  
 
 def yolov2_map(categories_file):
     with open(categories_file, mode='r') as txt_file:

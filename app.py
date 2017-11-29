@@ -4,15 +4,31 @@ Main application
 import json
 from flask import Flask
 from flask import jsonify, request, Response
+import optparse
 
 from detection.detector import detect_objects
 from detection.client import ObjectDetectionServer
 from detection.src.utils.label_map import get_labels
 
+
+# Set up the command-line options
+parser = optparse.OptionParser()
+
+parser.add_option("-m", "--model", help="Detection model " + \
+                   "[default %s]" % "yolov2", default='yolov2')
+parser.add_option("-H", "--host", help="Hostname of the Flask app " + \
+                   "[default %s]" % "127.0.0.1", default="127.0.0.1")
+parser.add_option("-P", "--port", help="Port for the Flask app " + \
+                   "[default %s]" % "5000", default="5000")
+
+options, _ = parser.parse_args()
+
+model    = options.model
 app      = Flask(__name__)
 
 
-@app.route('/'):
+
+@app.route('/')
 def index():
     return "hello world"
 
@@ -56,10 +72,12 @@ def _debug_mask(bboxes):
     img_mask.save(output, format='JPEG')
 
     data_url = base64.b64encode(output.getvalue())
-
     return data_url
-if __name__ == "__main__":
-    model    = 'ssd'
-    detector = ObjectDetectionServer('localhost:9000', model, get_labels(model))
 
-    app.run(debug=True)
+if __name__ == "__main__":
+    detector = ObjectDetectionServer('localhost:9000', model, get_labels(model))
+    app.run(
+	debug=True,
+	host=options.host,
+	port=int(options.port)
+    )

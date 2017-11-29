@@ -35,7 +35,7 @@ class ObjectDetectionServer(object):
         request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto(image))
 
         pred  = time.time()
-        result = self.stub.Predict(request, 10.0)  # 5 secs timeout
+        result = self.stub.Predict(request, 20.0)  # 20 secs timeout
 
         if self.model == 'yolov2':
             num_detections = -1
@@ -45,10 +45,9 @@ class ObjectDetectionServer(object):
         classes = result.outputs['detection_classes'].float_val[:num_detections]
         scores  = result.outputs['detection_scores'].float_val[:num_detections]
         boxes   = result.outputs['detection_boxes'].float_val[:num_detections * 4]
-        classes = [self.label_dict[idx] for idx in classes]
-        # split to evenly size of 4
+        classes = [self.label_dict[int(idx)] for idx in classes]
+
         boxes   = [boxes[i:i + 4] for i in range(0, len(boxes), 4)]
-        # classes = [self.label_dict[idx] for idx in classes]
 
         if self.verbose:
             print("Server Prediction in {:.3f} sec || Total {:.3} sec".format(time.time() - pred, time.time() - start))

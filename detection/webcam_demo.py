@@ -19,6 +19,7 @@ FLAGS = tf.app.flags.FLAGS
 model = FLAGS.model
 detector = ObjectDetectionServer('localhost:9000', model, get_labels(model))
 
+
 def main(_):
     video_capture = WebcamVideoStream(0).start()
     fps = FPS().start()
@@ -69,8 +70,7 @@ def detect_objects_in(frame):
     predict = time.time()
     data = detector.predict(frame)
     print("Prediction in {}".format(time.time()-predict))
-    # boxes, classes, scores = filter_out(threshold=0.5, data=data)
-    boxes, classes, scores = data
+    boxes, classes, scores = filter_out(threshold=0.5, data=data)
     return boxes, classes, scores
 
 
