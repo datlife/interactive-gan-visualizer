@@ -10,7 +10,7 @@ import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
-from src.utils.label_map import get_labels
+from detection.src.utils.label_map import get_labels
 
 
 class ObjectDetectionClient(object):

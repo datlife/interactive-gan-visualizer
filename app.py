@@ -8,37 +8,19 @@ import json
 import optparse
 
 from flask import Flask
-from flask import jsonify, request, Response
+from flask import jsonify, request, Response, render_template
 
 from detection.client import ObjectDetectionClient
 from detection.server import ObjectDetectionServer
 from detection.detector import detect_objects
 
-# ##########################
-# APP CONFIGURATIONS
-# ##########################
 
-parser = optparse.OptionParser()
-parser.add_option("-m", "--model", default='ssd', help="Detection model [default ssd]")
-parser.add_option("-H", "--host", default="127.0.0.1", help="Hostname of the Flask app [default 127.0.0.1")
-parser.add_option("-P", "--port", default="5000", help="Port for the Flask app [default 5000]")
-args, _ = parser.parse_args()
-
-# ##########################
-# LAUNCH TF SERVING SERVER
-# ##########################
-
-model_path = os.path.join(sys.path[0], 'detection/serving_models/%s' % args.model)
-if not os.path.isdir(model_path):
-    raise IOError('Model is not supported yet. We only support yolov2, fasterrcnn, ssd')
-
-app       = Flask(__name__)
-ml_server = ObjectDetectionServer(args.model, model_path, port=9000)
+app       = Flask(__name__, template_folder='dist', static_folder='dist')
 
 
 @app.route('/')
 def index():
-    return "hello world"
+    return render_template('index.html')
 
 
 @app.route('/detect/', methods=["POST"])
@@ -94,11 +76,30 @@ def clean_up(signum, frame):
 
 
 if __name__ == "__main__":
+    # ##########################
+    # APP CONFIGURATIONS
+    # ##########################
+
+    parser = optparse.OptionParser()
+    parser.add_option("-m", "--model", default='ssd', help="Detection model [default ssd]")
+    parser.add_option("-H", "--host", default="127.0.0.1", help="Hostname of the Flask app [default 127.0.0.1")
+    parser.add_option("-P", "--port", default="5000", help="Port for the Flask app [default 5000]")
+    args, _ = parser.parse_args()
+
+    # ##########################
+    # LAUNCH TF SERVING SERVER
+    # ##########################
+    model_path = os.path.join(sys.path[0], 'detection/serving_models/%s' % args.model)
+    if not os.path.isdir(model_path):
+        raise IOError('Model is not supported yet. We only support yolov2, fasterrcnn, ssd')
+    ml_server = ObjectDetectionServer(args.model, model_path, port=9000)
 
     original_sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGINT, clean_up)
 
-    # Start app
+    # ##############
+    # START WEB APP
+    # ##############
     detector = ObjectDetectionClient('localhost:9000', args.model)
     ml_server.start()
     app.run(debug=True, host=args.host, port=int(args.port), use_reloader=False)
