@@ -1,31 +1,39 @@
 """
 Main application
 """
+import os
+import sys
+import signal  # to caught Ctrl+C
 import json
-from flask import Flask
-from flask import jsonify, request, Response
 import optparse
 
+from flask import Flask
+from flask import jsonify, request, Response
+
+from detection.client import ObjectDetectionClient
+from detection.server import ObjectDetectionServer
 from detection.detector import detect_objects
-from detection.client import ObjectDetectionServer
-from detection.src.utils.label_map import get_labels
 
+# ##########################
+# APP CONFIGURATIONS
+# ##########################
 
-# Set up the command-line options
 parser = optparse.OptionParser()
+parser.add_option("-m", "--model", default='ssd', help="Detection model [default ssd]")
+parser.add_option("-H", "--host", default="127.0.0.1", help="Hostname of the Flask app [default 127.0.0.1")
+parser.add_option("-P", "--port", default="5000", help="Port for the Flask app [default 5000]")
+args, _ = parser.parse_args()
 
-parser.add_option("-m", "--model", help="Detection model " + \
-                   "[default %s]" % "yolov2", default='yolov2')
-parser.add_option("-H", "--host", help="Hostname of the Flask app " + \
-                   "[default %s]" % "127.0.0.1", default="127.0.0.1")
-parser.add_option("-P", "--port", help="Port for the Flask app " + \
-                   "[default %s]" % "5000", default="5000")
+# ##########################
+# LAUNCH TF SERVING SERVER
+# ##########################
 
-options, _ = parser.parse_args()
+model_path = os.path.join(sys.path[0], 'detection/serving_models/%s' % args.model)
+if not os.path.isdir(model_path):
+    raise IOError('Model is not supported yet. We only support yolov2, fasterrcnn, ssd')
 
-model    = options.model
-app      = Flask(__name__)
-
+app       = Flask(__name__)
+ml_server = ObjectDetectionServer(args.model, model_path, port=9000)
 
 
 @app.route('/')
@@ -74,10 +82,25 @@ def _debug_mask(bboxes):
     data_url = base64.b64encode(output.getvalue())
     return data_url
 
+
+def clean_up(signum, frame):
+    global ml_server
+    # restore the original signal handler as otherwise evil things will happen
+    signal.signal(signal.SIGINT, original_sigint)
+    print("Serving is shutting down")
+    ml_server.stop()
+
+    sys.exit(1)
+
+
 if __name__ == "__main__":
-    detector = ObjectDetectionServer('localhost:9000', model, get_labels(model))
-    app.run(
-	debug=True,
-	host=options.host,
-	port=int(options.port)
-    )
+
+    original_sigint = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, clean_up)
+
+    # Start app
+    detector = ObjectDetectionClient('localhost:9000', args.model)
+    ml_server.start()
+    app.run(debug=True, host=args.host, port=int(args.port), use_reloader=False)
+
+

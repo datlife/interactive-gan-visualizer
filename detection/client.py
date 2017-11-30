@@ -1,6 +1,5 @@
 from __future__ import print_function
 from __future__ import absolute_import
-import os
 import cv2
 import time
 
@@ -11,15 +10,17 @@ import tensorflow as tf
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
+from src.utils.label_map import get_labels
 
 
-class ObjectDetectionServer(object):
+class ObjectDetectionClient(object):
 
-    def __init__(self, server, detection_model,  label_dict, verbose=False):
+    def __init__(self, server, detection_model,   verbose=False):
         self.host, self.port = server.split(':')
-        self.model = detection_model
-        self.verbose = verbose
-	self.label_dict = label_dict
+        self.model      = detection_model
+        self.label_dict = get_labels(detection_model)
+        self.verbose    = verbose
+
         channel   = implementations.insecure_channel(self.host, int(self.port))
         self.stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
 
@@ -53,6 +54,7 @@ class ObjectDetectionServer(object):
             print("Server Prediction in {:.3f} sec || Total {:.3} sec".format(time.time() - pred, time.time() - start))
 
         return boxes, classes, scores
+
 
 if __name__ == '__main__':
     import timeit

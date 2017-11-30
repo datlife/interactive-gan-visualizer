@@ -37,6 +37,7 @@ def covert_to_fabric_rect(img_shape, boxes, scores, classes):
         rects.append(rect)
     return rects
 
+
 def filter_out(threshold, data):
     boxes, classes, scores = data
     new_boxes   = []
