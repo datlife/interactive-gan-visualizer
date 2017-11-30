@@ -12,7 +12,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 // Constant with our paths
 const paths = {
   BUILD: path.resolve(__dirname, 'dist'),
-  SRC: path.resolve(__dirname, 'statics'),  
+  SRC: path.resolve(__dirname, 'static'),  
 };
 
 // Webpack configuration
