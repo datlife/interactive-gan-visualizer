@@ -32,7 +32,7 @@ class Photo extends React.Component {
       }.bind(canvas),{ crossOrigin: 'Anonymous' });
 
       canvas.on('object:modified',   (evt) => objectHandlder.scaling(canvas, id, evt));
-      canvas.on('object:moving',   (evt) => objectHandlder.moving(canvas, id, evt));      
+      canvas.on('object:moving',     (evt) => objectHandlder.moving(canvas, id, evt));      
       canvas.on('object:selected',   (evt) => objectHandlder.select(canvas, id, evt));
     } 
 

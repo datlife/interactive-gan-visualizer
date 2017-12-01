@@ -1,5 +1,6 @@
 import {createAction} from 'redux-actions';
 import * as types from '../constants';
+import {fabric} from 'fabric';
 
 export const selected = createAction(types.OBJECT_SELECTED);
 
@@ -28,9 +29,28 @@ export const scaling =(canvas, id, event) => (dispatch, getState) => {
 };
 
 export const moving  =(canvas, id, event) => (dispatch, getState) => {
-  console.log("moving")
-  // dispatch({
-  //   type: types.OBJECT_MOVING,
-  //   object: canvas
-  // })
+  if (getState().views.byId[id].confirmed){
+    let canvas_json = JSON.parse(getState().views.byId[id].canvas)
+    
+    var moving_obj  = canvas_json['objects'][1]  // reference confirmSelectedObject in fabricCanvashandler
+    console.log("moving")
+
+    //generated canvas
+    var generated_json = Object.assign({}, JSON.parse(getState().views.byId[`generated-${id}`].canvas))
+    generated_json.backgroundImage = {
+      ...generated_json.backgroundImage,
+      scaleX: 400 / moving_obj.width,
+      scaleY: 400 / moving_obj.height
+    }
+    dispatch({
+      type:  types.OBJECT_MOVING,
+      id:    `generated-${id}`,
+      canvas: JSON.stringify(generated_json)
+    })
+  }
+
+ 
+  // debug canvas
+  // console.log(canvas_json)
+
 }

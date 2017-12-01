@@ -60,6 +60,16 @@ function byId(state = {}, action) {
         }
       }
     }
+    case types.OBJECT_MOVING:{
+      let {id, canvas} = action;
+      return {
+        ...state,
+        [id]:{
+          ...state[id],
+          canvas: canvas
+        }
+      }
+    }
     case types.CONFIRM_SELECT:{
       let {id, canvas, confirmed} = action;
       return {
