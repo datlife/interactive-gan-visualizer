@@ -48,7 +48,7 @@ class Photo extends React.Component {
           console.log(fixed_obj)
         }
 
-        console.log("Reloading cavas "+ id) 
+        // console.log("Reloading cavas "+ id) 
       }   
     }
 

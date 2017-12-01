@@ -30,26 +30,27 @@ export const scaling =(canvas, id, event) => (dispatch, getState) => {
 
 export const moving  =(canvas, id, event) => (dispatch, getState) => {
   if (getState().views.byId[id].confirmed){
-    let canvas_json = JSON.parse(getState().views.byId[id].canvas)
-    
-    var moving_obj  = canvas_json['objects'][1]  // reference confirmSelectedObject in fabricCanvashandler
+    // reference confirmSelectedObject in fabricCanvashandler
+    let moving_obj = JSON.parse(getState().views.byId[id].canvas)['objects'][1]
     console.log("moving")
-
-    //generated canvas
+    // TODO: copy region iamge of fixed_obj int moving_obj
+    // moving_obj ={...moving_obj,
+    // }
+        //generated canvas
     var generated_json = Object.assign({}, JSON.parse(getState().views.byId[`generated-${id}`].canvas))
-    generated_json.backgroundImage = {
-      ...generated_json.backgroundImage,
-      scaleX: 400 / moving_obj.width,
-      scaleY: 400 / moving_obj.height
+    let generated_json = JSON.parse(getState().views.byId[`generated-${id}`].canvas)
+    
+    generated_json = {...generated_json,
+      ['objects']: [moving_obj]
     }
     dispatch({
-      type:  types.OBJECT_MOVING,
-      id:    `generated-${id}`,
-      canvas: JSON.stringify(generated_json)
-    })
-  }
+        type:  types.OBJECT_MOVING,
+        id:    `generated-${id}`,
+        canvas: JSON.stringify(generated_json)
+      })
+    }
 
- 
+  
   // debug canvas
   // console.log(canvas_json)
 
