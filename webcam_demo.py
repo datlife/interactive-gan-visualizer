@@ -6,7 +6,7 @@ import tensorflow as tf
 from multiprocessing import Queue, Pool
 from PIL import Image, ImageDraw, ImageFont
 
-from client import ObjectDetectionClient
+from detection.client import ObjectDetectionClient
 from detection.src.utils.label_map import get_labels
 from detection.src.utils.webcam import WebcamVideoStream
 
