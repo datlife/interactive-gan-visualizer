@@ -32,7 +32,7 @@ class Toolbar extends React.Component {
   }
 
   render() {
-    let {canvas_id, ImageHandler, isDebugging} = this.props;
+    let {canvas_id, ImageHandler} = this.props;
     return (
       <div className="d-flex flex-row">
         <div className="p-2">
@@ -40,12 +40,12 @@ class Toolbar extends React.Component {
             <RaisedButton className="mt-0" label="Detect" primary={true} onClick={this._detect.bind(this)}/>
             <RaisedButton className="mt-2" label="clear" secondary={true} onClick={this._clear.bind(this)}/>
             <Toggle       className="mt-3 toggle" label="Debug" 
-                          onToggle={(e) => ImageHandler.changeDebugMode(canvas_id, isDebugging)}/>
+                          onToggle={(e) => ImageHandler.changeDebugMode(canvas_id)}/>
           </div>
         </div>
 
         <div className="p-2">
-          <Card className="d-flex flex-column">
+          <Card className="d-flex">
             <IconButton className="mt-0" onClick={this._confirm.bind(this)}>
                 <DoneIcon />
             </IconButton>

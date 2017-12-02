@@ -26,8 +26,7 @@ def index():
 @app.route('/detect/', methods=["POST"])
 def detect():
     global detector
-    data = json.dumps(request.form.to_dict())
-    data = json.loads(data)
+    data = json.loads(json.dumps(request.form.to_dict()))
 
     try:
         detections    = detect_objects(data['image'], detector)
@@ -40,11 +39,10 @@ def detect():
     return response
 
 
-@app.route('/debug/', methods=["GET"])
+@app.route('/debug/', methods=["POST"])
 def update_debug():
-    data = None
+    data_url = _debug_mask(json.loads(request.form.to_dict()['bboxes']))
 
-    data_url = _debug_mask(data)
     response = jsonify(data_url)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
@@ -57,8 +55,16 @@ def _debug_mask(bboxes):
     from PIL import Image
 
     mask = np.zeros((400, 400), np.uint8)
-    img_mask = Image.fromarray(mask)
+    try:
+        for i, box in enumerate(bboxes):
+            b = json.loads(json.dumps(box))
+            top, left, width, height = int(b['top']), int(b['left']), int(b['width']), int(b['height'])
+            mask[top:top+height, left:left+width] = 122*(i+1)
+    except:
+        pass
+
     output = StringIO()
+    img_mask = Image.fromarray(mask)
     img_mask.save(output, format='JPEG')
 
     data_url = base64.b64encode(output.getvalue())
@@ -67,11 +73,9 @@ def _debug_mask(bboxes):
 
 def clean_up(signum, frame):
     global ml_server
-    # restore the original signal handler as otherwise evil things will happen
     signal.signal(signal.SIGINT, original_sigint)
     print("Serving is shutting down")
     ml_server.stop()
-
     sys.exit(1)
 
 
@@ -79,7 +83,6 @@ if __name__ == "__main__":
     # ##########################
     # APP CONFIGURATIONS
     # ##########################
-
     parser = optparse.OptionParser()
     parser.add_option("-m", "--model", default='ssd', help="Detection model [default ssd]")
     parser.add_option("-H", "--host", default="127.0.0.1", help="Hostname of the Flask app [default 127.0.0.1")
@@ -89,11 +92,13 @@ if __name__ == "__main__":
     # ##########################
     # LAUNCH TF SERVING SERVER
     # ##########################
-    model_path = os.path.join(sys.path[0], 'detection/serving_models/%s' % args.model)
+    model_path = os.path.join(sys.path[0],
+                              'detection/serving_models/%s' % args.model)
+
     if not os.path.isdir(model_path):
         raise IOError('Model is not supported yet. We only support yolov2, fasterrcnn, ssd')
-    ml_server = ObjectDetectionServer(args.model, model_path, port=9000)
 
+    ml_server = ObjectDetectionServer(args.model, model_path, port=9000)
     original_sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGINT, clean_up)
 
@@ -102,6 +107,5 @@ if __name__ == "__main__":
     # ##############
     detector = ObjectDetectionClient('localhost:9000', args.model)
     ml_server.start()
-    app.run(debug=True, host=args.host, port=int(args.port), use_reloader=False)
-
+    app.run(debug=True, host=args.host, port=int(args.port), use_reloader=True)
 

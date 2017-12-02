@@ -25,8 +25,9 @@ export function update_debug(id, bboxes) {
   var formData = new FormData();
   formData.append("id", id);
   formData.append("bboxes", JSON.stringify(bboxes));
+
   return axios
-    .get('http://localhost:5000/debug/', formData, {
+    .post('http://localhost:5000/debug/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

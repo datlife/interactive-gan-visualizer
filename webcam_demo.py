@@ -7,8 +7,8 @@ from multiprocessing import Queue, Pool
 from PIL import Image, ImageDraw, ImageFont
 
 from client import ObjectDetectionClient
-from src.utils.label_map import get_labels
-from src.utils.webcam import WebcamVideoStream
+from detection.src.utils.label_map import get_labels
+from detection.src.utils.webcam import WebcamVideoStream
 
 # Command line arguments
 tf.app.flags.DEFINE_string('server', 'localhost:9000', 'PredictionService host:port')

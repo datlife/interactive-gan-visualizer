@@ -12,20 +12,46 @@ export const deleteImage = (id) => (dispatch, getState) => {
   dispatch({type: DELETE_IMAGE, id: id});
 }
 
-export const changeDebugMode = (id, current_debug_mode) => (dispatch, getState) => {
-  const canvas = getState().views.byId[id].canvas;
-  let result = API.update_debug(id, JSON.parse(canvas)["objects"])
+export const changeDebugMode = (id) => (dispatch, getState) => {
+  const objects =  JSON.parse(getState().views.byId[id].canvas)["objects"];
+  var bboxes = objects.map(function(box){
+    return {
+      top: box.top,
+      left: box.left,
+      width: box.width,
+      height: box.height
+    }
+  })
+
+  // @TODO: logiccccc
+  let isDebugging = getState().images.byId[id].isDebugging
+  let result = API.update_debug(id, bboxes)
   result.then(
     function(res){      
       var blob = b64toBlob(res.data, 'data:image/jpg;base64,');
-      console.log(blob)
       var blobUrl = URL.createObjectURL(blob);
-      console.log(blobUrl)
       dispatch({
         type: 'TOGGLE_DEBUG',
         id: id,
-        debug: !current_debug_mode,
+        debug: !isDebugging,
         mask: blobUrl,
       });
     })
+  
 };
+  // // Create obj mask in debug
+  // let objects = JSON.parse(getState().views.byId[id].canvas)["objects"].map(function(obj){
+  //   obj = {...obj,
+  //     hasBorder: false,
+  //     stroke: 'white',
+  //     strokeWidth: 3,
+  //     fill:'white'
+  //   }
+  //   return obj
+  // })
+  // dispatch({
+  //   type: types.TOGGLE_DEBUG,
+  //   id: id,
+  //   debug: !current_debug_mode,
+  //   mask: blobUrl,
+  // });
