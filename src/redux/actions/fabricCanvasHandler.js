@@ -16,7 +16,7 @@ export const confirmSelectedObject = (id) => (dispatch, getState) =>{
   const moveable_box = view.selected
   const fix_box      = view.selected.set({hasControl: false, selectable: false})
 
-  canvas_json['objects'] = new Array(fix_box, moveable_box);
+  canvas_json['objects'] = [fix_box, moveable_box];
 
   dispatch({type: types.CONFIRM_SELECT, 
             id: id, 
@@ -33,7 +33,7 @@ export const detectObjects = (id) => (dispatch, getState) =>{
     let result = API.detect_object(image.id, reader.result)
     result.then(
       function(res){
-        var detected_ojects =  new Array();    
+        var detected_ojects =  [];    
         res.data.forEach(e => {
           const rect = new fabric.Rect({
             top:   e.top,

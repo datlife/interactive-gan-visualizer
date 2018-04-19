@@ -4,10 +4,8 @@ import { fabric } from 'fabric';
 // Just a bunch of Material UI components
 import AddIcon from 'material-ui/svg-icons/content/add';
 import DoneIcon from 'material-ui/svg-icons/action/done';
-import ClearIcon from 'material-ui/svg-icons/content/clear';
-import SaveIcon from 'material-ui/svg-icons/content/save';
-import {Card, IconButton, GridList, MenuItem, Slider, SelectField,
-  Toggle, ToolbarSeparator, RaisedButton} from 'material-ui';
+
+import {Card, IconButton, Toggle, RaisedButton} from 'material-ui';
 
 // Redux
 import {connect} from 'react-redux';
@@ -81,7 +79,7 @@ class Toolbar extends React.Component {
 
   _clear(){
     let {canvas_id, fabricCanvasActions} = this.props;    
-    this.props.fabricCanvasActions.clear(canvas_id);    
+    fabricCanvasActions.clear(canvas_id);    
   }
 }
 

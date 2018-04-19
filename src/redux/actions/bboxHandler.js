@@ -16,8 +16,7 @@ export const select = (canvas, id, event) => (dispatch, getState) => {
 
 export const scaling =(canvas, id, event) => (dispatch, getState) => {
   let obj = event.target;
-
-  const {width, height, scaleX, scaleY, strokeWidth} = obj;
+  const {width, height, scaleX, scaleY} = obj;  // strokeWidth
   obj
     .setWidth(width * scaleX)
     .setHeight(height * scaleY)
@@ -32,35 +31,17 @@ export const moving  =(canvas, id, event) => (dispatch, getState) => {
   if (getState().views.byId[id].confirmed){
     // reference confirmSelectedObject in fabricCanvashandler
     let view = getState().views.byId[id]
-    let fix_obj = JSON.parse(view.canvas)['objects'][0]
+    // let fix_obj = JSON.parse(view.canvas)['objects'][0]
     let moving_obj = JSON.parse(view.canvas)['objects'][1]
     // TODO: copy region image of fixed_obj int moving_obj
     // moving_obj = {...moving_obj, fill: pattern}
     let generated_json = JSON.parse(getState().views.byId[`generated-${id}`].canvas)
-    generated_json = {...generated_json,['objects']: [moving_obj]}
+    generated_json = {...generated_json, 'objects': [moving_obj]}
     dispatch({
         type:  types.OBJECT_MOVING,
         id:    `generated-${id}`,
         canvas: JSON.stringify(generated_json)
       })
-    // fabric.Image.fromURL(JSON.parse(view.canvas)['backgroundImage'].src, 
-    //   function(img){
-    //     img.set({
-    //       originX: fix_obj.top,
-    //       originY: fix_obj.left
-    //     })
-    //     var patternCanvas = new fabric.StaticCanvas();
-    //     patternCanvas.add(img)
-    //     patternCanvas.renderAll();
-
-    //     var pattern = new fabric.Pattern({
-    //       source: patternCanvas.getElement() ,
-    //       repeat: 'repeat'
-    //     });
-    //     console.log(pattern)
-
-    // })
-   
 
     let isDebugging = getState().images.byId[id].isDebugging
     if (isDebugging){

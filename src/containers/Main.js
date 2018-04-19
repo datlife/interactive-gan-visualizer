@@ -3,7 +3,7 @@ import SingleView from '../components/SingleView';
 
 // Redux
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+// import {bindActionCreators} from 'redux';
 
 function mapStatesToProps(state){
   return {

@@ -1,7 +1,5 @@
 import {combineReducers} from 'redux';
-import dotProp from "dot-prop-immutable";
 import * as types from '../constants';
-import {fabric} from 'fabric';
 
 export default combineReducers({byId: byId, allIds: allIds})
 
@@ -72,7 +70,7 @@ function byId(state = {}, action) {
       }
     }
     case types.CONFIRM_SELECT:{
-      let {id, canvas, confirmed} = action;
+      let {id, canvas} = action;
       return {
         ...state,
         [id]:{

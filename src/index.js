@@ -7,16 +7,17 @@ import App from './App';
 import configureStore from './redux/store';
 import {Provider} from 'react-redux';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './styles/main.css';
 import * as types from './redux/constants';
 import dataURItoBlob from './utils';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/main.css';
+
 const store = configureStore({});
 
-// Intialize an example - I know it is long and ugly:(
+// Intialize an example
 var img = new Image();
-img.src = 'assets/car2.jpg';
+img.src = 'examples/car2.jpg';
 img.onload = function () {
 	var canvas = document.createElement('canvas'), context = canvas.getContext('2d');
 	canvas.width = img.width; canvas.height = img.height;

@@ -29,7 +29,7 @@ class Photo extends React.Component {
         image.set({width: 400, height:400});
         canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas));
         canvasActions.initialize(id, canvas);                
-      }.bind(canvas),{ crossOrigin: 'Anonymous' });
+      }, { crossOrigin: 'Anonymous' });
 
       canvas.on('object:modified',   (evt) => objectHandlder.scaling(canvas, id, evt));
       // canvas.on('object:moving',     (evt) => objectHandlder.moving(canvas, id, evt));     
@@ -39,7 +39,7 @@ class Photo extends React.Component {
     } 
 
     reload(){
-      let {view, id} = this.props;
+      let {view} = this.props;
       if(view){
         let canvas = this.fabricCanvas;        
         canvas.loadFromJSON(view.canvas);
