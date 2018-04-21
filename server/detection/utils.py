@@ -35,7 +35,7 @@ def _debug_mask(bboxes):
 			mask[top:top+height, left:left+width] = 122*(i+1)
 	except:
 		pass
-	output = StringIO()
+	output = cStringIO.StringIO()
 	img_mask = Image.fromarray(mask)
 	img_mask.save(output, format='JPEG')
 	data_url = base64.b64encode(output.getvalue())
