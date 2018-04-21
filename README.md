@@ -2,6 +2,7 @@
 
 This is an ONGOING research project.
 
+![Cover](assets/cover.png)
 -------------------
 
 ## Overview
