@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 
-def detect_objects(image_base64, detector):
+def make_detection_request(image_base64, detector):
     # Decode string into np.array
     image = re.sub('^data:image/.+;base64,', '', image_base64).decode('base64')
     image = np.asarray(Image.open(cStringIO.StringIO(image)))

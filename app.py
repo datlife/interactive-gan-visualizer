@@ -10,27 +10,21 @@ import optparse
 
 from flask import Flask
 from flask import jsonify, request, Response, render_template
+
 from server.detection import DetectionClient, DetectionServer
-from server.detection.utils import  detect_objects, parse_label_map, _debug_mask
+from server.detection.utils import  make_detection_request, parse_label_map, _debug_mask
 
-app = Flask(__name__, template_folder='dist', static_folder='dist')
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
+app = Flask(__name__)
 @app.route('/detect/', methods=["POST"])
-def send_detection_request():
+def detect_object():
 	global detector
 	data = json.loads(json.dumps(request.form.to_dict()))
 	try:
-		detections = detect_objects(data['image'], detector)
+		detection_result = make_detection_request(data['image'], detector)
 	except Exception as e:
 		print(e)
 		return Response(jsonify({'msg': 'TensorFlow Serving not available'}), status=503)
-
-	response = jsonify(detections)
+	response = jsonify(detection_result)
 	response.headers.add('Access-Control-Allow-Origin', '*')
 	return response
 
@@ -55,12 +49,9 @@ def parse_args():
 	# APP CONFIGURATIONS
 	# ##########################
 	parser = optparse.OptionParser()
-	parser.add_option("-m", "--model", default='ssd',
-										help="Detection model [default ssd]")
-	parser.add_option("-H", "--host", default="127.0.0.1",
-										help="Hostname of the Flask app [default 127.0.0.1")
-	parser.add_option("-P", "--port", default="5000",
-										help="Port for the Flask app [default 5000]")
+	parser.add_option("-m", "--model", default='ssd', help="Detection model [default ssd]")
+	parser.add_option("-H", "--host", default="127.0.0.1", help="Hostname of the Flask app [default 127.0.0.1")
+	parser.add_option("-P", "--port", default="5000", help="Port for the Flask app [default 5000]")
 	args, _ = parser.parse_args()
 
 	### DEFAULT ARGS
@@ -71,7 +62,6 @@ def parse_args():
 
 if __name__ == "__main__":
 	args = parse_args()
-
 	# ##########################
 	# LAUNCH TF SERVING SERVER
 	# ##########################
