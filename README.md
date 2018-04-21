@@ -1,14 +1,35 @@
 ## Interactive Image Generator
 
-This is an ONGOING project that we explore the possbility wheather a generative model could be able to learn the geometric context of the image to create new image, given a conditional mask.
+This is an ONGOING research project.
 
-### Step 1: Install node modules
-```
-cd ./statics
-npm install
+#### Overview
+```shell
+./
+├── app.py  # Flask Applicatiton
+├── assets  # Stores trained ML models for inference
+├── client  # UI/UX for the app, written using `create-react-app`
+└── server  # Python codes for Back-end logics (object detection, image generator, etc.) 
 ```
 
-### Step 2: Start all ML server, Flask Server, and React App
+#### Usage
+* Read  [`INSTALLATION.md`.](INSTALL.md)
+* To run the app, from terminal
 ```
-start.sh
+run app.py
 ```
+* An app is available at http://localhost:3000
+
+#### TODO list
+
+- [ ] Documentation
+- [ ] Fix error handlings bug
+- [ ] Update API for Image Generator 
+
+#### Roadmap
+* Integrate GAN model in `server/generator` once it is ready.
+* Improve rendering speed in front-end
+* Switch to `GraphQL` for client-server communtication
+* Dockerize the app for cloud deployment
+
+#### Acknowledgement
+ Thank your phD student Fanyi Xiao and professor Yong J. Lee for providing me resources and support to work on this project.
