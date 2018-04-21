@@ -24,6 +24,7 @@ run app.py
 - [ ] Documentation
 - [ ] Fix error handlings bug
 - [ ] Update API for Image Generator 
+- [ ] Add unit tests, converage tests
 
 ### Roadmap
 * Integrate GAN model in `server/generator` once it is ready.

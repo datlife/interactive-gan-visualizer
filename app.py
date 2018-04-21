@@ -21,10 +21,11 @@ def detect_object():
 	data = json.loads(json.dumps(request.form.to_dict()))
 	try:
 		detection_result = make_detection_request(data['image'], detector)
+		response = jsonify(detection_result)
 	except Exception as e:
 		print(e)
 		return Response(jsonify({'msg': 'TensorFlow Serving not available'}), status=503)
-	response = jsonify(detection_result)
+		
 	response.headers.add('Access-Control-Allow-Origin', '*')
 	return response
 
