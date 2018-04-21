@@ -1,31 +1,36 @@
-"""
-Main application
+"""Main Flask application
 """
 import os
 import sys
 import re
-import signal  # to caught Ctrl+C
+import signal 
 import json
 import optparse
 
 from flask import Flask
 from flask import jsonify, request, Response, render_template
-
 from server.detection import DetectionClient, DetectionServer
 from server.detection.utils import  make_detection_request, parse_label_map, _debug_mask
 
 app = Flask(__name__)
+
 @app.route('/detect/', methods=["POST"])
 def detect_object():
+  """Send images to Object detection server
+
+  Returns:
+    response - HTTP response with list of bounding boxes, probabilities
+  """
   global detector
   data = json.loads(json.dumps(request.form.to_dict()))
   try:
     detection_result = make_detection_request(data['image'], detector)
-    response = jsonify(detection_result)
   except Exception as e:
     print(e)
     return Response(jsonify({'msg': 'TensorFlow Serving not available'}), status=503)
-    
+
+  response = jsonify(detection_result)
+  print(detection_result)
   response.headers.add('Access-Control-Allow-Origin', '*')
   return response
 
