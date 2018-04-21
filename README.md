@@ -38,4 +38,4 @@ run app.py
 
 ## Acknowledgement
 
- Thank your phD student Fanyi Xiao and professor Yong J. Lee for providing me resources and support to work on this project.
+ Thank your PhD student Fanyi Xiao and professor Yong J. Lee for providing me resources and support to work on this project.
