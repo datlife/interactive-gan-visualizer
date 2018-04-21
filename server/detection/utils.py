@@ -14,7 +14,6 @@ def make_detection_request(image_base64, detector):
     image = Image.open(cStringIO.StringIO(image)).convert('RGB')
     image = np.array(image)
     h, w, _ = image.shape
-    print(image.shape)
     boxes, classes, scores = detector.predict(image, img_dtype=np.uint8) 
     filtered_outputs = [(box, idx, score) for box, idx, score in zip(boxes, classes, scores)
                                 if score > 0.5]
@@ -23,8 +22,9 @@ def make_detection_request(image_base64, detector):
         boxes = [box * np.array([h, w, h, w]) for box in boxes]
     else:  # no detection
         boxes, classes, scores = [], [], []
+        
     # Due to the fixed size of canvas in front-end. (400, 400) is fixed
-    rects = covert_to_fabric_rect((400, 400, 3), boxes, scores, classes)
+    rects = covert_to_fabric_rect(boxes, scores, classes)
     return rects
 
 def _debug_mask(bboxes):
@@ -38,17 +38,12 @@ def _debug_mask(bboxes):
 	except:
 		pass
 	output = cStringIO.StringIO()
-	img_mask = Image.fromarray(mask)
-	img_mask.save(output, format='JPEG')
 	data_url = base64.b64encode(output.getvalue())
 	return data_url
 
-def covert_to_fabric_rect(img_shape, boxes, scores, classes):
-    width, height, _ = img_shape
-    stretch = width / float(height)
+def covert_to_fabric_rect(boxes, scores, classes):
     rects = []
     for box, score, category in zip(boxes, scores, classes):
-        box = box * np.array([width*(1/stretch), height*stretch, width*(1/stretch), height*stretch])
         y1, x1, y2, x2 = [int(i) for i in box]
         rect = {
             'top':    y1,
