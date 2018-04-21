@@ -11,9 +11,11 @@ from PIL import Image
 def make_detection_request(image_base64, detector):
     # Decode string into np.array
     image = re.sub('^data:image/.+;base64,', '', image_base64).decode('base64')
-    image = np.asarray(Image.open(cStringIO.StringIO(image)))
+    image = Image.open(cStringIO.StringIO(image)).convert('RGB')
+    image = np.array(image)
     h, w, _ = image.shape
-    boxes, classes, scores = detector.predict(image) 
+    print(image.shape)
+    boxes, classes, scores = detector.predict(image, img_dtype=np.uint8) 
     filtered_outputs = [(box, idx, score) for box, idx, score in zip(boxes, classes, scores)
                                 if score > 0.5]
     if zip(*filtered_outputs):
