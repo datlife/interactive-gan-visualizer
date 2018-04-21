@@ -10,14 +10,10 @@ export const initialize = (id, canvas) => (dispatch, getState) => {
 
 export const confirmSelectedObject = (id) => (dispatch, getState) =>{  
   const view = getState().views.byId[id];  
-  
   var canvas_json = Object.assign({}, JSON.parse(view.canvas))
-  
   const moveable_box = view.selected
   const fix_box      = view.selected.set({hasControl: false, selectable: false})
-
   canvas_json['objects'] = [fix_box, moveable_box];
-
   dispatch({type: types.CONFIRM_SELECT, 
             id: id, 
             confirmed: true,
@@ -53,6 +49,10 @@ export const detectObjects = (id) => (dispatch, getState) =>{
         dispatch({type: types.DETECT_OBJECT, 
                   id:id, 
                   canvas: JSON.stringify(new_canvas_json) })        
+    }).catch(resp => {
+      // Catch Error when sever is not available
+      // Display Error Message on screen
+      console.log(resp)
     }); 
   }
 };   

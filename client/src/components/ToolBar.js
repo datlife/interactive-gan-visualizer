@@ -50,12 +50,6 @@ class Toolbar extends React.Component {
             <IconButton className="mt-0" onClick={this._addBox.bind(this)}>
                 <AddIcon />
             </IconButton>
-            {/* <IconButton className="mt-0">
-                <ClearIcon />
-            </IconButton> */}
-            {/* <IconButton className="mt-0" onClick={this._save.bind(this)}>
-                <SaveIcon/>
-            </IconButton> */}
           </Card>
         </div>
       </div>

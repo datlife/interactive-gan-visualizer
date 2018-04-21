@@ -15,7 +15,6 @@ const mapDispatchToProps = (dispatch) => ({
   ImageHandler: bindActionCreators(ImageHandler, dispatch),
 });
 
-
 class SingleView extends React.Component {
   /*
   * This view is reponsible for updating all posible states of its children:
@@ -31,16 +30,13 @@ class SingleView extends React.Component {
           <div className="align-self-start col-2">
             <Toolbar canvas_id={id} {...props} isDebugging={image.isDebugging}/>
           </div>
-
           <div className="col-10">
             <div className="d-flex flex-row justify-content-between">
-
               <div className="p-2"><Photo 
                                       id={id}  
                                       background={image.original}
                                       view={views.byId[id]}
                                       caption={"Original Image"}/> </div>
-
               <div className="p-2"><Photo 
                                       id={`generated-${id}`} 
                                       background={image.generated}

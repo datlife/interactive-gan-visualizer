@@ -37,8 +37,7 @@ def detect_object():
 
 @app.route('/debug/', methods=["POST"])
 def update_debug():
-  data_url = _debug_mask(
-    json.loads(request.form.to_dict()['bboxes']))
+  data_url = _debug_mask(json.loads(request.form.to_dict()['bboxes']))
   response = jsonify(data_url)
   response.headers.add('Access-Control-Allow-Origin', '*')
   return response

@@ -31,8 +31,8 @@ class Photo extends React.Component {
         canvasActions.initialize(id, canvas);                
       }, { crossOrigin: 'Anonymous' });
 
-      canvas.on('object:modified',   (evt) => objectHandlder.scaling(canvas, id, evt));
-      // canvas.on('object:moving',     (evt) => objectHandlder.moving(canvas, id, evt));     
+      // canvas.on('object:modified',   (evt) => objectHandlder.scaling(canvas, id, evt));
+      canvas.on('object:moving',     (evt) => objectHandlder.moving(canvas, id, evt));     
       canvas.on('object:selected',   (evt) => objectHandlder.select(canvas, id, evt));
       canvas.on('mouse:up',          (evt) => objectHandlder.moving(canvas, id, evt));                  
       
@@ -48,7 +48,6 @@ class Photo extends React.Component {
           let fixed_obj =   canvas.getObjects()[0]
           console.log(fixed_obj)
         }
-        // console.log("Reloading cavas "+ id) 
       }   
     }
 

@@ -3,7 +3,6 @@ import SingleView from '../components/SingleView';
 
 // Redux
 import {connect} from 'react-redux';
-// import {bindActionCreators} from 'redux';
 
 function mapStatesToProps(state){
   return {
@@ -28,9 +27,11 @@ class Content extends React.Component{
           <ul className="list-group">{
             images.allIds.length  
             ? images.allIds.map((id) => {
-                  return <SingleView  key={id} id={id} 
-                                      image={images.byId[id]} 
-                                      {...props}/> }) 
+              return <SingleView  
+                        key={id} 
+                        id={id} 
+                        image={images.byId[id]} 
+                        {...props}/> }) 
             : null}
           </ul>
         </div>
