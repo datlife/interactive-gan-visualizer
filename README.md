@@ -33,9 +33,10 @@ run app.py
 
 ## Roadmap
 * Integrate GAN model in `server/generator` once it is ready.
-* Improve rendering speed in front-end
-* Switch to `GraphQL` for client-server communtication
-* Dockerize the app for cloud deployment
+* Improve rendering speed in front-end.
+* Switch from `HTTP/JSON` to `gRPC`.
+* Dockerize the app for cloud deployment.
+* Re-written back-end server from python to Go.
 
 ## Acknowledgement
 
