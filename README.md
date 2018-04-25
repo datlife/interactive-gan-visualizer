@@ -1,6 +1,6 @@
 # Interactive Image Generator
 
-This is an ONGOING research project.
+Status: ONGOING research project.
 
 ![Cover](assets/cover.png)
 -------------------
