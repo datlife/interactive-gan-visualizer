@@ -17,7 +17,7 @@ Status: ONGOING research project.
 
 ## Usage
 
-* Read  [`INSTALLATION.md`.](INSTALL.md)
+* Read  [`INSTALLATION.md`.](INSTALLATION.md)
 * To run the app, from terminal
 ```
 run app.py
