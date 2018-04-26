@@ -1,5 +1,8 @@
 # Installation Guide
-This guide details how to start the interactive image generator web application. There are **two main steps**: install dependencies for Front-end (running in Javascript, using `create-react-app`), install dependencies for back-end (running in Python).
+
+There are **two main steps**: 
+  * Install dependencies for Front-end (running in Javascript, using `create-react-app`), 
+  * Install dependencies for back-end (running in Python).
 
 **Tested platform**:  `Ubuntu 16.04 x64`
 
