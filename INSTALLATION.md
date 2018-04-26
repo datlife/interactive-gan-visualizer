@@ -1,5 +1,6 @@
 # Installation Guide
-This guide details how to start the interactive image generator web application.
+This guide details how to start the interactive image generator web application. There are **two main steps**: install dependencies for Front-end (running in Javascript), install dependencies for back-end (running in Python).
+
 **Tested platform**:  `Ubuntu 16.04 x64`
 
 ### Installation
@@ -9,14 +10,13 @@ This guide details how to start the interactive image generator web application.
 sudo apt-get install libgif-dev
 ```
 
-* Install NodeJS
+* Install [NodeJS](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 ```shell
-todo
-
-npm --version
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
 
-* Set up client dependencies
+* Set up client dependencies, first `cd` to client directory
 ```
 cd client        # contain `package.json`
 npm install      # install required dependencies
@@ -27,9 +27,11 @@ npm install      # install required dependencies
 * Install `tensorflow-serving-model`
 ```shell
 echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | sudo tee /etc/apt/sources.list.d/tensorflow-serving.list
-
 curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg | sudo apt-key add -
-
 sudo apt-get update && sudo apt-get install tensorflow-model-server
+```
+
+* Install dependencies for Back-end (`requirements.txt`)
+```shell
 ```
 
