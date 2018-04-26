@@ -15,7 +15,7 @@ sudo apt-get install -y nodejs
 
 * Install dependencies for FabricJS
 ```shell
-sudo apt-get install libgif-dev
+sudo apt-get install libcairo2-dev libjpeg-dev libgif-dev
 ```
 * Set up client dependencies, first `cd` to client directory
 ```
