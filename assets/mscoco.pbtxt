@@ -103,7 +103,7 @@ item {
   name: 'bear'
 }
 item {
- 
+
   id: 24
   name: 'zebra'
 }
@@ -388,7 +388,6 @@ item {
   name: 'hair drier'
 }
 item {
- 
   id: 90
   name: 'toothbrush'
 }
