@@ -1,20 +1,19 @@
 # Installation Guide
-This guide details how to start the interactive image generator web application. There are **two main steps**: install dependencies for Front-end (running in Javascript), install dependencies for back-end (running in Python).
+This guide details how to start the interactive image generator web application. There are **two main steps**: install dependencies for Front-end (running in Javascript, using `create-react-app`), install dependencies for back-end (running in Python).
 
 **Tested platform**:  `Ubuntu 16.04 x64`
 
 ##  Front-end Setup
-* Install dependencies for FabricJS
-```shell
-sudo apt-get install libgif-dev
-```
-
 * Install [NodeJS](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 ```shell
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
+* Install dependencies for FabricJS
+```shell
+sudo apt-get install libgif-dev
+```
 * Set up client dependencies, first `cd` to client directory
 ```
 cd client        # contain `package.json`
