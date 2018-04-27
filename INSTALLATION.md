@@ -32,10 +32,11 @@ curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.re
 sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```
 
-* Install dependencies for Back-end (`requirements.txt`)
+* Install dependencies for Back-end (`requirements.txt`).
 ```shell
+pip install -r requirements.txt
 ```
-
+> NOTES: If you would like to use TensorFlow version, modify `tensorflow` in requirements.txt to `tensorflow-gpu`.
 
 ## Known issues
 
