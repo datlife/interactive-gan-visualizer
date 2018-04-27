@@ -36,3 +36,21 @@ sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```shell
 ```
 
+
+## Known issues
+
+During the installation, you might experience these issuse
+
+### 1.  `CXXABI_1.3.11' not found
+
+* Tensorflow 1.7 was shipped with compiled version of Ubuntu. Issuse has been discussed [here](https://github.com/tensorflow/serving/issues/819)
+```shell
+tensorflow_model_server: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by tensorflow_model_server)
+```
+
+**Solution**:
+```shell
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+sudo apt-get update
+sudo apt-get install libstdc++6
+```
