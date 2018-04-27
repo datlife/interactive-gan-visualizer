@@ -86,4 +86,4 @@ if __name__ == "__main__":
   detector = DetectionClient(
     'localhost:%s'% args.ML_SERVER_PORT, args.model,label_map)
   detection_server.start()
-  app.run(debug=True, host=args.host, port=int(args.port), use_reloader=True)
+  app.run(debug=False, host=args.host, port=int(args.port), use_reloader=False)
