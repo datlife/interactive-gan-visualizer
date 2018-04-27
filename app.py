@@ -9,15 +9,17 @@ import optparse
 
 from flask import Flask
 from flask import jsonify, request, Response, render_template
+
 from server.detection import DetectionClient, DetectionServer
 from server.detection.utils import  make_detection_request, parse_label_map, _debug_mask
+
+# @TODO: Image Generator server
 
 app = Flask(__name__)
 
 @app.route('/detect/', methods=["POST"])
 def detect_object():
   """Send images to Object detection server
-
   Returns:
     response - HTTP response with list of bounding boxes, probabilities
   """
@@ -37,12 +39,18 @@ def detect_object():
 
 @app.route('/debug/', methods=["POST"])
 def update_debug():
+  """Generate conditional mask input for debugging
+  Return:
+    response - HTTP response with encoded image for debugging
+  """
   data_url = _debug_mask(json.loads(request.form.to_dict()['bboxes']))
   response = jsonify(data_url)
   response.headers.add('Access-Control-Allow-Origin', '*')
   return response
 
 def clean_up(signum, frame):
+  """Shut down server gracefully
+  """
   global detection_server
   signal.signal(signal.SIGINT, original_sigint)
   print("Serving is shutting down")
