@@ -32,7 +32,7 @@ npm start
 * You can view the demo at `http://localhost:3000/`
 
 ## TODO list
-
+- [ ] Formalize installation process and deploy to production
 - [ ] Documentation
 - [ ] Fix error handlings bug
 - [ ] Update API for Image Generator 
