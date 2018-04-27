@@ -36,7 +36,7 @@ sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```shell
 pip install -r requirements.txt
 ```
-> NOTES: If you would like to use TensorFlow version, modify `tensorflow` in requirements.txt to `tensorflow-gpu`.
+> NOTES: If you would like to use TensorFlow GPU version, modify `tensorflow` in requirements.txt to `tensorflow-gpu`.
 
 ## Known issues
 
@@ -44,7 +44,7 @@ During the installation, you might experience these issuse
 
 #### 1.  `CXXABI_1.3.11' not found
 
-* Tensorflow 1.7 was shipped with compiled version of Ubuntu. Issuse has been discussed [here](https://github.com/tensorflow/serving/issues/819)
+* Tensorflow 1.7 was shipped with compiled version of Ubuntu 16.04. Issuse has been discussed [here](https://github.com/tensorflow/serving/issues/819)
 ```shell
 tensorflow_model_server: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `CXXABI_1.3.11' not found (required by tensorflow_model_server)
 ```
