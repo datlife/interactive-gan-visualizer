@@ -21,11 +21,13 @@ Status: ONGOING research project.
 * To run the app, open  2 separate terminals
 ```python
 # Launch back-end server
+# Press Ctrl C to stop
 python app.py
 ```
 
 ```shell
 # Launch front-end server
+# Press Ctrl C to stop
 cd client
 npm start
 ```
