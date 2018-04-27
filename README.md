@@ -18,11 +18,17 @@ Status: ONGOING research project.
 ## Usage
 
 * Read  [`INSTALLATION.md`.](INSTALLATION.md)
-* To run the app, from terminal
+* To run the app, open  2 separate terminals
+```python
+# Launch back-end server
+python app.py
 ```
-run app.py
 ```
-* An app is available at http://localhost:3000
+# Launch front-end server
+cd client
+npm start
+```
+* You can view the demo at `http://localhost:3000/`
 
 ## TODO list
 
