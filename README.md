@@ -23,7 +23,8 @@ Status: ONGOING research project.
 # Launch back-end server
 python app.py
 ```
-```
+
+```shell
 # Launch front-end server
 cd client
 npm start
